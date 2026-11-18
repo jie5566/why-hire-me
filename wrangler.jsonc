@@ -1,0 +1,9 @@
+// Cloudflare deploy settings: serve this folder as a static website.
+{
+  "name": "why-hire-me",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./",
+    "html_handling": "auto-trailing-slash"
+  }
+}
