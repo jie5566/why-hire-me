@@ -885,24 +885,6 @@ html.case-open { overflow: hidden; }
 
     ctx.clearRect(0, 0, vw, vh);
 
-    /* the spine: the page's centre line, filled as you go */
-    if (!narrow) {
-      var top = 72;
-      /* while the object is a chart, the line steps aside so it never cuts through the bars */
-      var gapA = clamp(ov2 * 1.4, 0, 1), gT = 0, gB = 0;
-      if (gapA > 0) { gT = Y - 170 * Sc; gB = Y + 170 * Sc; }
-      var spine = function (col, y0, y1) {
-        if (y1 <= y0) return;
-        if (gapA <= 0) { ctx.fillStyle = col; ctx.fillRect(X - 0.5, y0, 1, y1 - y0); return; }
-        ctx.fillStyle = col;
-        if (gT > y0) ctx.fillRect(X - 0.5, y0, 1, Math.min(y1, gT) - y0);
-        if (y1 > gB) ctx.fillRect(X - 0.5, Math.max(y0, gB), 1, y1 - Math.max(y0, gB));
-        var m0 = Math.max(y0, gT), m1 = Math.min(y1, gB);
-        if (m1 > m0) { ctx.globalAlpha = 1 - gapA; ctx.fillRect(X - 0.5, m0, 1, m1 - m0); ctx.globalAlpha = 1; }
-      };
-      spine(rgb(dim), top, vh);
-      spine(inkS, top, top + (vh - top) * clamp(p / 6, 0, 1));
-    }
     /* warm glow in dark mode, contact shadow once it is solid */
     if (md > 0.01) {
       var R = 260 * Sc;
