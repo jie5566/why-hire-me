@@ -334,6 +334,12 @@ html.case-open { overflow: hidden; }
 .case-fig img { width: 100%; border-radius: 6px; background: var(--ph); }
 .case-fig figcaption { color: var(--soft); text-transform: none; letter-spacing: 0; font-size: 12px; }
 .case-pair.natural img { aspect-ratio: auto; height: auto; object-fit: contain; }
+.case-films { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.case-films > div { min-width: 0; }
+.case-films iframe { display: block; width: 100%; aspect-ratio: 9 / 16; border: 0; border-radius: 8px; background: #10251b; }
+.case-films figcaption { margin-top: 8px; color: var(--soft); }
+.case-films-note { margin: 10px 0 0; color: var(--soft); }
+@media (max-width: 640px) { .case-films { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; } }
 .case-links { display: flex; gap: 20px; flex-wrap: wrap; margin: 0; }
 .case-links a, .case-end a { color: var(--acc); font-weight: 500; text-decoration: none; }
 .case-links a:hover, .case-end a:hover { text-decoration: underline; text-underline-offset: 4px; }
@@ -983,21 +989,31 @@ var CASES = {
   'pocket-gem': {
     kicker: 'Side project · Nov 2026',
     title: 'Pocket Gem: a map of little places, shared by parents',
-    lead: 'As a mother of two, I turned "where should we go this weekend?" into a live, bilingual web app in 4 days, from first design to launch.',
-    meta: [['Role', 'Product, UX/UI, brand, AI-built with Claude'], ['Team', 'Solo'], ['Time', '4 days'], ['Stack', 'Cloudflare Workers, Supabase (EU)']],
+    lead: 'As a mother of two, I turned "where should we go this weekend?" into a live, bilingual web app in 4 days: product, brand, illustrations, films and launch, all made with AI and all directed by me.',
+    meta: [['Role', 'Product, UX/UI, brand, illustration direction, AI-built with Claude'], ['Team', 'Solo'], ['Time', '4 days'], ['Stack', 'Cloudflare Workers, Supabase (EU)']],
     img: [['assets/pocket-gem.jpg', 'Pocket Gem: a crayon-drawn folded map with a red pin, next to the line "Little places. Big discoveries."']],
     task: 'I found weekend outings by scrolling Google Maps spot by spot. The best places often aren\'t on the map at all, like a small bee garden near our home that kids love but has no pin. Parents know these places, but the tips get lost in group chats. The goal: a free map of family-friendly places, shared by parents, that opens on any phone without an app.',
     action: [
       '<b>Set the product\'s limits.</b> A web app instead of a native app, opened from a link or QR code and installable to the home screen. English and Swedish from day one. No accounts, to keep the barrier low.',
       '<b>Designed trust into the system.</b> New places wait for approval. Three reports from different browsers hide a place automatically, without deleting it. Data is stored in the EU, and fonts are self-hosted so nothing is sent to Google.',
       '<b>Built it with Claude.</b> I worked as product owner and designer, directing AI-assisted development: map and address search, photo upload, share links and link previews.',
+      '<b>Designed the brand from scratch.</b> Logo, colours, type and a crayon-drawn world: a hedgehog family, category icons, empty states and the welcome map. AI made every image; my job was the judgment. I set one style, rejected anything off-style, and kept icons, screens and films feeling like one hand drew them.',
       '<b>Designed for coming back.</b> Gem Passport: stamp a place only within 150 m of it; three stamps earn the family a shareable "Gem Keeper" certificate.',
-      '<b>Built the brand and launch kit.</b> Logo, a crayon hedgehog family, category illustrations, a poster with a tracked QR code, social posts and three short films.'
+      '<b>Made the launch kit.</b> A poster with a tracked QR code, social posts and three short films: one promo and two story films about real hidden places.'
     ],
-    learning: 'For a product built on other people\'s tips, moderation and privacy are features, and they are far cheaper to design at the start. With AI writing the code, my job became deciding what to build, what to leave out, and why.',
+    figs: [
+      ['assets/pg-brand.jpg', 'Pocket Gem identity: the geometric logo in forest green and berry red, the crayon hedgehog character in a red hat and scarf, and the folded welcome map with a red pin', 'Identity · logo, the hedgehog family and the welcome map'],
+      ['assets/pg-illustrations.jpg', 'Pocket Gem illustration system: six crayon category icons (animals, café, forest, hidden gem, museum, playground) and six scenes for sharing, submitted, no places nearby, saved places, food and nature', 'Illustration system · category icons and empty states, one hand, one palette']
+    ],
+    films: [
+      ['films/promo/index.html', 'Pocket Gem promo film', 'Promo · 24 s'],
+      ['films/bee-garden/index.html', 'Pocket Gem story film: the bee garden', 'Story · the bee garden'],
+      ['films/secret-tree/index.html', 'Pocket Gem story film: the secret in the tree', 'Story · the secret in the tree']
+    ],
+    learning: 'For a product built on other people\'s tips, moderation and privacy are features, and they are far cheaper to design at the start. With AI making the code and the images, my job became deciding what to build, what to leave out, and what is good enough to ship.',
     result: [
       '<b>About 4 days from first design to a live product</b>, working solo.',
-      'Launch-ready: bilingual, installable, moderated, privacy-conscious and free, with a marketing kit ready to go.',
+      'Launch-ready: bilingual, installable, moderated, privacy-conscious and free, with a full brand and marketing kit.',
       'Places that exist on no map now have a home that other parents can find and add to.',
       'Next: launch, then track places shared, poster scans, stamps per family and certificates shared.'
     ],
@@ -1182,6 +1198,7 @@ var CASES = {
     h += '<section><p class="case-k mono">A — Action</p><ul>' + c.action.map(function (a) { return '<li>' + a + '</li>'; }).join('') + '</ul></section>';
     if (c.figs) h += c.figs.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     if (c.pair) h += '<figure class="case-pair' + (c.pairNatural ? ' natural' : '') + '">' + c.pair.map(function (q) { return '<div><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
+    if (c.films) h += '<figure class="case-films">' + c.films.map(function (q) { return '<div><iframe src="' + q[0] + '" title="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy" allow="autoplay"></iframe><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
     if (c.figsEnd) h += c.figsEnd.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     h += '<section><p class="case-k mono">L — Learning</p><p>' + c.learning + '</p></section>';
     h += '<section class="case-r"><p class="case-k mono">R — Result</p><ul>' + c.result.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></section>';

@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocket Gem — the secret in the tree</title>
+<style>
+@font-face{font-family:Lora;src:url(../assets/Lora-Variable.woff) format('woff');font-weight:400 700;font-style:normal}
+@font-face{font-family:Lora;src:url(../assets/Lora-Italic-Variable.woff) format('woff');font-weight:400 700;font-style:italic}
+@font-face{font-family:'Source Sans 3';src:url(../assets/SourceSans3-Variable.woff) format('woff');font-weight:200 900}
+html,body{margin:0;height:100%;background:#10251B;overflow:hidden}
+#wrap{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}
+#stage{position:absolute;inset:0;overflow:hidden;background:#F1E8E2}
+#stage svg{position:absolute;inset:0}
+.cap{position:absolute;left:90px;right:90px;text-align:center;font-family:Lora,serif;font-weight:600;color:#10251B;opacity:0}.cap .w{display:inline-block;opacity:0}
+.en{font-size:84px;line-height:1.05;text-wrap:balance}
+.sv{font-style:italic;font-weight:500;font-size:46px;color:#6B2E2B}
+.ui{font-family:'Source Sans 3',sans-serif}
+#play{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,37,27,.55);border:0;cursor:pointer;color:#F1E8E2;font:600 22px 'Source Sans 3',sans-serif;flex-direction:column;gap:16px;width:100%}
+#play span.btn{width:96px;height:96px;border-radius:50%;background:#D90A24;display:flex;align-items:center;justify-content:center}
+#bar{position:fixed;left:0;bottom:0;height:4px;background:#D90A24;width:0}
+body.render #play,body.render #bar{display:none}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+<svg id="svg" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<div id="caps"></div>
+</div></div>
+<button id="play" type="button" aria-label="Play the film"><span class="btn"><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#FBF6F1"/></svg></span><span>Play · Spela</span></button>
+<div id="bar"></div>
+<audio id="music" src="music.mp3?v=1" preload="auto"></audio>
+<script>
+const DUR = 23.2;
+const C = {paper:'#F1E8E2',paperHi:'#FBF6F1',paperLo:'#EADDD3',blush:'#E7AFA8',blushLo:'#EFD9CF',forest:'#173E32',forestD:'#10251B',berry:'#D90A24',berryD:'#B73548',ink:'#34271F',inkSoft:'#5C4A3E',plum:'#6B2E2B',skin:'#EEC3A3'};
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const easeOut=x=>{x=clamp(x);return 1-Math.pow(1-x,3)};const easeIn=x=>{x=clamp(x);return x*x*x};
+const ease=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+const back=x=>{x=clamp(x);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const prog=(t,a,d)=>clamp((t-a)/d);
+// scene windows [start,end] with 0.5 s crossfades
+const SC=[[-3,-2],[0,6.5],[6,15.5],[15,19.5],[19,23.2]];
+const sceneA=(t,i)=>{const[a,b]=SC[i];if(t<a||t>b+.02)return 0;return a<=0?1:ease(clamp((t-a)/.5))};
+
+/* ---------- hedgehog characters (facing right; origin = ground under body) ---------- */
+const H={spD:'#3F3128',spM:'#6A5444',spL:'#A88D74',fur:'#E7C9A8',furD:'#D4AE88',belly:'#F4E0C8',paw:'#5C4A3E'};
+function spikes(cx,cy,rx,ry,a0,a1,n,tip,col){let d='';const P=a=>[cx+rx*Math.cos(a),cy-ry*Math.sin(a)];
+ for(let i=0;i<=n;i++){const a=(a0+(a1-a0)*i/n)*Math.PI/180;const[x,y]=P(a);d+=(i?'L':'M')+x.toFixed(1)+','+y.toFixed(1);
+  if(i<n){const am=(a0+(a1-a0)*(i+.5)/n)*Math.PI/180;const k=tip*(i%2?0.94:1.06);d+='L'+(cx+rx*k*Math.cos(am)).toFixed(1)+','+(cy-ry*k*Math.sin(am)).toFixed(1)}}
+ return d}
+function mantle(id,kid){const top=kid?60:62;
+ const outer=spikes(-10,-262,178,248,255,top,22,1.2,'');
+ const end=[-10+178*Math.cos(top*Math.PI/180),-262-248*Math.sin(top*Math.PI/180)];
+ const inner=`C${kid?-5:5},-385 -22,-150 -56,-22 Z`;
+ const mid=spikes(-14,-258,160,226,250,top+4,20,1.12,'');
+ let quills='';for(let i=0;i<26;i++){const a=(245-i*7)*Math.PI/180;const r=.62+((i*37)%10)/40;const x=-30+150*r*Math.cos(a),y=-262-215*r*Math.sin(a);const ang=Math.atan2(-Math.sin(a),Math.cos(a));quills+=`M${x.toFixed(1)},${y.toFixed(1)} l${(Math.cos(ang)*26).toFixed(1)},${(Math.sin(ang)*26).toFixed(1)} `}
+ return `<path d="${outer}${inner}" fill="${H.spD}"/><path d="${mid}${inner}" fill="${H.spM}"/><path d="${quills}" stroke="${H.spL}" stroke-width="5" stroke-linecap="round" fill="none" clip-path="url(#mclip${id})"/><clipPath id="mclip${id}"><path d="${mid}${inner}"/></clipPath>`}
+function hog(id,kid){
+ const scarf=kid?C.blush:C.forest, stripe=kid?C.berry:C.blush;
+ const eyeR=kid?[13,17]:[11,14];
+ return `
+<g id="${id}">
+ <ellipse cx="20" cy="4" rx="${kid?150:170}" ry="20" fill="${C.ink}" opacity=".12" id="${id}sh"/>
+ <g id="${id}b"><g filter="url(#crayon)">
+  <ellipse cx="0" cy="-250" rx="150" ry="228" fill="${H.fur}"/>
+  <ellipse cx="10" cy="-62" rx="128" ry="42" fill="${H.furD}" opacity=".7"/>
+  <ellipse cx="62" cy="-168" rx="84" ry="116" fill="${H.belly}"/>
+  ${mantle(id,kid)}
+  <g id="${id}ft"><ellipse cx="-36" cy="-16" rx="44" ry="21" fill="${H.paw}"/><ellipse cx="62" cy="-16" rx="44" ry="21" fill="${H.paw}"/></g>
+  <g id="${id}fs" display="none"><ellipse cx="128" cy="-46" rx="40" ry="22" fill="${H.paw}"/><ellipse cx="168" cy="-30" rx="40" ry="22" fill="${H.paw}"/></g>
+  <g id="${id}hd">
+   <circle cx="50" cy="-448" r="27" fill="${H.fur}"/><circle cx="52" cy="-446" r="13" fill="${C.blush}"/>
+   <path d="M90,-418 C150,-418 206,-374 224,-352 C232,-340 222,-328 208,-328 C168,-326 128,-316 96,-298 Z" fill="${H.fur}"/>
+   <circle cx="222" cy="-346" r="16" fill="${C.ink}"/><circle cx="216" cy="-352" r="4.5" fill="${C.paperHi}"/>
+   <ellipse cx="150" cy="-346" rx="21" ry="12" fill="${C.blush}" opacity=".85"/>
+   <g id="${id}ey"><ellipse cx="128" cy="-388" rx="${eyeR[0]}" ry="${eyeR[1]}" fill="${C.ink}"/><circle cx="${kid?133:131}" cy="${kid?-394:-393}" r="${kid?5:4}" fill="${C.paperHi}"/></g>
+   <path id="${id}lid" d="M112,-396 Q128,-380 146,-396" stroke="${C.ink}" stroke-width="5" fill="none" stroke-linecap="round" display="none"/>
+   ${mouths(id,182,-318,kid?.8:.9)}
+   ${kid?`<g><path d="M-30,-452 C-34,-560 128,-566 124,-456 Z" fill="${C.berry}"/><path d="M-6,-468 L-2,-540 M30,-466 L32,-552 M66,-466 L66,-552 M100,-470 L98,-540" stroke="${C.berryD}" stroke-width="7" stroke-linecap="round"/><rect x="-40" y="-474" width="172" height="34" rx="17" fill="${C.berryD}"/><circle cx="46" cy="-572" r="28" fill="${C.paperHi}"/></g>`:''}
+  </g>
+  <path d="M-14,-322 Q70,-292 156,-316 L158,-276 Q70,-252 -16,-284 Z" fill="${scarf}"/>
+  <path d="M10,-310 L14,-282 M50,-302 L52,-272 M90,-300 L92,-270 M130,-306 L132,-276" stroke="${stripe}" stroke-width="7"/>
+  <path d="M96,-290 L86,-180 L122,-176 L128,-288 Z" fill="${scarf}"/><path d="M88,-176 L84,-158 M100,-174 L98,-156 M112,-174 L112,-156 M122,-174 L124,-158" stroke="${scarf}" stroke-width="6" stroke-linecap="round"/>
+  <g id="${id}a" transform="rotate(10 40 -200)">
+   <rect x="22" y="-212" width="38" height="128" rx="19" fill="${H.furD}"/>
+   <g id="${id}ph" display="none"><rect x="10" y="-126" width="84" height="138" rx="14" fill="${C.ink}"/><rect x="19" y="-116" width="66" height="112" rx="8" fill="${C.paperHi}"/><circle cx="52" cy="-68" r="10" fill="${C.berry}"/></g>
+   <ellipse cx="41" cy="-84" rx="24" ry="20" fill="${H.paw}"/>
+  </g>
+ </g></g>
+</g>`}
+function mouths(id,x,y,s){return `<g transform="translate(${x} ${y}) scale(${s})">
+ <path id="${id}m_smile" d="M-16,-4 Q2,14 18,-6" stroke="${C.ink}" stroke-width="5" fill="none" stroke-linecap="round"/>
+ <path id="${id}m_open" d="M-16,-6 Q2,30 20,-8 Z" fill="${C.plum}" stroke="${C.ink}" stroke-width="4" stroke-linejoin="round" display="none"/>
+ <path id="${id}m_flat" d="M-12,2 L14,0" stroke="${C.ink}" stroke-width="5" stroke-linecap="round" display="none"/>
+ <path id="${id}m_frown" d="M-14,8 Q2,-4 16,6" stroke="${C.ink}" stroke-width="5" fill="none" stroke-linecap="round" display="none"/>
+ <ellipse id="${id}m_o" cx="2" cy="4" rx="9" ry="12" fill="${C.plum}" stroke="${C.ink}" stroke-width="4" display="none"/>
+</g>`}
+
+const HN={gold:'#E8A93B',goldL:'#F3C766',goldD:'#C98A2B',wax:'#F3E2A8',waxL:'#FAF0CC',wood:'#B07A52',woodL:'#C9966C',suit:'#FBF6F1',seam:'#DCD3CC',glove:'#E3C27A',hare:'#C9B29A',hareL:'#EADBC8',veil:'#34271F'};
+const beeSVG=(id)=>`<g id="${id}"><g id="${id}f"><ellipse cx="-4" cy="-16" rx="13" ry="17" fill="#FFFFFF" opacity=".85" id="${id}w1"/><ellipse cx="10" cy="-14" rx="11" ry="15" fill="#FFFFFF" opacity=".75" id="${id}w2"/>
+ <ellipse cx="0" cy="0" rx="24" ry="17" fill="#F2C14E"/><path d="M-8,-15 Q-12,0 -8,15 M4,-16 Q0,0 4,16" stroke="${C.ink}" stroke-width="6" fill="none"/>
+ <circle cx="18" cy="-3" r="4" fill="${C.ink}"/><path d="M-24,0 l-9,2" stroke="${C.ink}" stroke-width="4" stroke-linecap="round"/></g></g>`;
+const BEES=[];for(let i=0;i<9;i++)BEES.push({cx:560+((i*83)%260)-60,cy:1180+((i*61)%300),ax:120+(i*29)%110,ay:60+(i*17)%70,fx:.23+(i%4)*.06,fy:.37+(i%3)*.08,ph:i*1.9});
+const pin=(x,y,id,img)=>`<g id="${id}" transform="translate(${x} ${y})"><g filter="url(#crayon)"><path d="M0,0 C-10,-26 -40,-46 -40,-78 A40,40 0 1 1 40,-78 C40,-46 10,-26 0,0 Z" fill="${C.berry}" stroke="${C.ink}" stroke-width="4"/><circle cx="0" cy="-78" r="27" fill="${C.paperHi}"/></g><image href="../assets/${img}.webp" x="-23" y="-101" width="46" height="46"/></g>`;
+const star=(id,x,y,r,col)=>`<path id="${id}" transform="translate(${x} ${y})" d="M0,-${r} Q${r*.18},-${r*.18} ${r},0 Q${r*.18},${r*.18} 0,${r} Q-${r*.18},${r*.18} -${r},0 Q-${r*.18},-${r*.18} 0,-${r} Z" fill="${col}"/>`;
+
+/* ---------- rain drops ---------- */
+let rain='';const drops=[];for(let i=0;i<40;i++){const d={x:200+((i*97)%680),y0:(i*173)%640,r:5+(i*7)%7,ph:i*1.7,sp:70+(i*13)%60};drops.push(d);rain+=`<circle id="rd${i}" r="${d.r}" fill="#FFFFFF"/>`}
+let snow='';const flakes=[];for(let i=0;i<70;i++){const d={x:(i*151)%1080,y0:(i*263)%1960,r:5+(i*5)%9,ph:i*2.3,sp:80+(i*17)%90};flakes.push(d);snow+=`<circle id="sf${i}" r="${d.r}" fill="#FFFFFF" stroke="#C9D3D6" stroke-width="2" opacity="${.75+((i*3)%4)*.08}"/>`}
+
+/* ---------- build ---------- */
+const svg=document.getElementById('svg');
+svg.innerHTML=`
+<defs>
+ <filter id="crayon" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+  <feTurbulence id="boil" type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="1" result="n"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G" result="d"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="1" seed="7" result="g"/>
+  <feColorMatrix in="g" type="matrix" values="0 0 0 0 .984  0 0 0 0 .965  0 0 0 0 .945  0 0 0 2.2 -1.15" result="spk"/>
+  <feComposite in="spk" in2="d" operator="atop"/>
+ </filter>
+ <filter id="paper" x="0" y="0" width="100%" height="100%">
+  <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4"/>
+  <feColorMatrix type="matrix" values="0 0 0 0 .2  0 0 0 0 .15  0 0 0 0 .1  0 0 0 -.9 .55"/>
+ </filter>
+ <clipPath id="winClip"><rect x="200" y="560" width="680" height="600" rx="10"/></clipPath>
+ <clipPath id="scrClip"><rect x="264" y="634" width="552" height="1032" rx="50"/></clipPath>
+</defs>
+
+<g id="s0" display="none"></g>
+
+<!-- SCENE 2: phone -->
+<g id="s1" opacity="0">
+ <rect width="1080" height="1920" fill="${C.blushLo}"/>
+ <g id="phone">
+  <g filter="url(#crayon)"><rect x="240" y="610" width="600" height="1080" rx="72" fill="${C.ink}"/></g>
+  <g clip-path="url(#scrClip)">
+   <rect x="264" y="634" width="552" height="1032" fill="${C.paperLo}"/>
+   <g filter="url(#crayon)">
+    <path d="M264,900 Q380,860 420,950 T560,1000 Q640,1040 600,1160 T720,1330 Q820,1380 816,1460 L816,1666 L264,1666 Z" fill="none"/>
+    <ellipse cx="370" cy="1050" rx="120" ry="90" fill="#9DB5A0"/>
+    <ellipse cx="700" cy="860" rx="140" ry="100" fill="#9DB5A0"/>
+    <ellipse cx="640" cy="1480" rx="170" ry="110" fill="#9DB5A0"/>
+    <path d="M264,1240 Q420,1180 520,1260 T816,1210" stroke="${C.blush}" stroke-width="34" fill="none" stroke-linecap="round"/>
+    <path d="M300,760 Q450,820 520,1100 T460,1600" stroke="${C.paperHi}" stroke-width="16" fill="none"/>
+    <path d="M816,1000 Q640,1080 560,1360" stroke="${C.paperHi}" stroke-width="12" fill="none"/>
+   </g>
+   <g id="pins">${pin(400,1040,'pn0','cat-playground')}${pin(700,860,'pn1','cat-forest')}${pin(560,1250,'pn2','cat-cafe')}${pin(650,1480,'pn3','cat-animals')}${pin(360,1420,'pn4','cat-museum')}<g id="pnB" transform="translate(690 1170)"><circle id="pnBglow" cx="0" cy="-80" r="70" fill="#F3C766" opacity=".5"/><g filter="url(#crayon)"><path d="M0,0 C-12,-30 -48,-54 -48,-92 A48,48 0 1 1 48,-92 C48,-54 12,-30 0,0 Z" fill="${C.berry}"/><circle cx="0" cy="-92" r="33" fill="${C.paperHi}"/></g><image href="../assets/cat-hidden-gem.webp" x="-28" y="-120" width="56" height="56"/><g id="pinbee"></g></g></g>
+   <g id="me"><circle cx="520" cy="1160" r="34" fill="${C.berry}" opacity=".25" id="mepulse"/><circle cx="520" cy="1160" r="15" fill="${C.berry}" stroke="${C.paperHi}" stroke-width="5"/></g>
+   <rect x="264" y="634" width="552" height="120" fill="${C.paperHi}"/>
+   <g transform="translate(296 668) scale(.04)"><clipPath id="logoCapA"><path d="M0 0H1280V1280L1049 1280L0 231Z"/></clipPath><path d="M180 188H1086V1090Q1086 1112 1070 1096L169 209Q153 188 180 188Z" stroke="#173E32" stroke-width="60" fill="none"/><circle cx="512" cy="743" r="110" fill="#B73548" clip-path="url(#logoCapA)"/><path d="M159 390V1110H879Z" fill="#173E32"/></g>
+   <text x="352" y="712" font-family="Lora" font-weight="600" font-size="34" fill="${C.forestD}">Pocket Gem</text>
+   <g id="card" transform="translate(0 420)">
+    <rect x="284" y="1330" width="512" height="320" rx="30" fill="${C.paperHi}" stroke="${C.ink}" stroke-opacity=".2" stroke-width="2"/>
+    <g filter="url(#crayon)"><rect x="360" y="1344" width="120" height="150" rx="20" fill="#7A5A44"/><ellipse cx="420" cy="1420" rx="30" ry="40" fill="${C.ink}"/><path d="M380,1344 L460,1344" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/></g>
+    <image href="../assets/cat-hidden-gem.webp" x="520" y="1360" width="96" height="96"/><g id="cardbee"></g>
+    <text x="350" y="1550" font-family="Lora" font-weight="600" font-size="38" fill="${C.forestD}">Hidden gem · Dold pärla</text>
+    <text x="350" y="1596" font-family="Source Sans 3" font-weight="600" font-size="28" fill="${C.inkSoft}">1.2 km · A tree with a secret</text>
+   </g>
+  </g>
+ </g>
+ <g transform="translate(140 2130)">${hog('k2',1)}</g>
+ <g id="hand" filter="url(#crayon)">
+  <path d="M930,1920 L842,1560 Q832,1500 880,1488 L950,1496 Q1000,1520 1030,1920 Z" fill="${H.furD}"/>
+  <path d="M900,1660 L960,1640 M916,1740 L990,1716" stroke="${H.fur}" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="868" cy="1470" rx="46" ry="38" fill="${H.paw}"/>
+  <circle cx="830" cy="1424" r="17" fill="${H.paw}"/><circle cx="822" cy="1462" r="17" fill="${H.paw}"/><circle cx="828" cy="1500" r="17" fill="${H.paw}"/>
+ </g>
+</g>
+
+<!-- SCENE 3: the secret in the tree -->
+<g id="s2" opacity="0">
+ <defs><clipPath id="noteClip"><rect id="noteRect" x="120" y="420" width="840" height="0"/></clipPath></defs>
+ <rect width="1080" height="1920" fill="#E9E6E3"/>
+ <g filter="url(#crayon)">
+  <path d="M0,1180 Q260,1110 540,1160 T1080,1130 L1080,1920 L0,1920 Z" fill="#F4F5F3"/>
+  <path d="M60,1200 l70,-260 l70,260 Z M150,1190 l50,-190 l50,190 Z M960,1170 l60,-230 l60,230 Z" fill="#6E8F7E"/>
+  <path d="M86,1100 l44,-160 l44,160 Z M168,1080 l32,-120 l32,120 Z M984,1060 l36,-120 l36,120 Z" fill="#FFFFFF" opacity=".9"/>
+  <rect x="300" y="760" width="26" height="430" fill="#F7F4EE"/><path d="M300,820 l14,0 M312,900 l14,0 M300,990 l12,0 M310,1080 l16,0" stroke="${C.ink}" stroke-width="7"/>
+  <rect x="400" y="820" width="20" height="360" fill="#F7F4EE"/><path d="M400,880 l10,0 M410,960 l10,0 M400,1050 l12,0" stroke="${C.ink}" stroke-width="6"/>
+  <path d="M0,1560 Q420,1500 1080,1580 L1080,1920 L0,1920 Z" fill="#FBFBF9"/>
+  <path d="M0,1560 Q420,1500 1080,1580" stroke="#DCE3E3" stroke-width="12" fill="none"/>
+ </g>
+ <!-- the big old tree -->
+ <g filter="url(#crayon)">
+  <path d="M600,-20 L900,-20 L905,1560 Q960,1650 1040,1700 L560,1700 Q620,1650 610,1560 Z" fill="#7A5A44"/>
+  <path d="M650,100 Q640,400 660,700 M720,40 Q730,300 712,600 M820,120 Q840,500 818,900 M860,700 Q850,1000 868,1300 M640,900 Q630,1100 650,1300" stroke="#5C4A3E" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M900,640 Q1000,600 1100,520 L1100,580 Q1000,650 904,700 Z" fill="#7A5A44"/><path d="M904,632 Q1000,592 1100,512 L1100,532 Q1000,610 904,652 Z" fill="#FFFFFF"/>
+  <path d="M560,1700 Q760,1660 1040,1700 L1040,1720 L560,1720 Z" fill="#FFFFFF"/>
+  <ellipse cx="740" cy="1440" rx="84" ry="110" fill="#5C4A3E"/>
+  <ellipse cx="740" cy="1446" rx="66" ry="92" fill="#2A211B"/>
+  <path d="M664,1520 Q740,1500 816,1520 Q800,1556 740,1556 Q680,1556 664,1520 Z" fill="#FFFFFF"/>
+ </g>
+ <!-- hedgehogs -->
+ <g transform="translate(150 1840) scale(.95)">${hog('p3')}</g>
+ <g transform="translate(470 1830) scale(.66)">${hog('k3',1)}</g>
+ <!-- jar -->
+ <g id="jarT">
+  <g filter="url(#crayon)"><rect x="-46" y="-62" width="92" height="118" rx="20" fill="#E7EEF0"/></g>
+  <g id="scrollIn"><rect x="-20" y="-40" width="40" height="80" rx="10" fill="${C.paperHi}"/><rect x="-20" y="-6" width="40" height="10" fill="${C.berry}"/></g>
+  <rect x="-46" y="-62" width="92" height="118" rx="20" fill="none" stroke="${C.inkSoft}" stroke-width="5"/>
+  <path d="M-30,-48 L-30,36" stroke="#FFFFFF" stroke-width="8" opacity=".8" stroke-linecap="round"/>
+  <g id="lid"><g filter="url(#crayon)"><rect x="-52" y="-86" width="104" height="30" rx="8" fill="${C.berry}"/></g><path d="M-40,-80 l0,18 M-20,-80 l0,18 M0,-80 l0,18 M20,-80 l0,18 M40,-80 l0,18" stroke="#FFFFFF" stroke-width="5" opacity=".7"/></g>
+  <rect id="jarShade" x="-60" y="-100" width="120" height="170" rx="20" fill="#2A211B" opacity=".55"/>
+ </g>
+ <!-- flying scroll -->
+ <g id="scrollFly"><g filter="url(#crayon)"><rect x="-26" y="-60" width="52" height="120" rx="14" fill="${C.paperHi}"/></g><rect x="-26" y="-8" width="52" height="14" fill="${C.berry}"/></g>
+ <!-- the note -->
+ <g id="note">
+  <g clip-path="url(#noteClip)">
+   <g transform="rotate(-1.5 540 900)">
+    <g filter="url(#crayon)"><rect x="140" y="430" width="800" height="900" rx="12" fill="${C.paperHi}"/></g>
+    <path d="M190,640 L890,640 M190,1010 L890,1010" stroke="#C9D3D6" stroke-width="3"/>
+    <text x="540" y="530" text-anchor="middle" font-family="Lora" font-style="italic" font-size="46" fill="${C.plum}">Psst… you found it!</text>
+    <text x="540" y="602" text-anchor="middle" font-family="Lora" font-weight="600" font-size="50" fill="${C.forestD}">Welcome to the</text>
+    <text x="540" y="700" text-anchor="middle" font-family="Lora" font-weight="700" font-size="76" fill="${C.berry}">Secret Gem Club</text>
+    <g font-family="Source Sans 3" font-weight="600" font-size="38" fill="${C.ink}">
+     <circle cx="220" cy="792" r="26" fill="${C.blush}"/><text x="220" y="805" text-anchor="middle" font-weight="700" font-size="32">1</text><text x="268" y="805">Look closely at little things.</text>
+     <circle cx="220" cy="872" r="26" fill="${C.blush}"/><text x="220" y="885" text-anchor="middle" font-weight="700" font-size="32">2</text><text x="268" y="885">Leave every place a bit nicer.</text>
+     <circle cx="220" cy="952" r="26" fill="${C.blush}"/><text x="220" y="965" text-anchor="middle" font-weight="700" font-size="32">3</text><text x="268" y="965">Share a gem with a friend.</text>
+    </g>
+    <text x="540" y="1080" text-anchor="middle" font-family="Lora" font-style="italic" font-size="36" fill="${C.plum}">Välkommen till Hemliga Pärlklubben!</text>
+    <text x="840" y="1180" text-anchor="end" font-family="Lora" font-style="italic" font-size="38" fill="${C.forestD}">— The Gem Keepers</text>
+    <image href="../assets/cat-hidden-gem.webp" x="190" y="1120" width="110" height="110"/>
+   </g>
+   <g id="stamp" transform="translate(760 1260)"><g filter="url(#crayon)"><circle r="78" fill="none" stroke="${C.berry}" stroke-width="10"/><circle r="62" fill="none" stroke="${C.berry}" stroke-width="4"/></g>
+    <text y="-8" text-anchor="middle" font-family="Source Sans 3" font-weight="800" font-size="30" fill="${C.berry}">MEMBER</text><text y="28" text-anchor="middle" font-family="Source Sans 3" font-weight="700" font-size="26" fill="${C.berry}">MEDLEM ★</text></g>
+  </g>
+  <g id="roll"><g filter="url(#crayon)"><rect x="128" y="-22" width="824" height="44" rx="22" fill="#EFE6D6"/></g><path d="M140,0 L940,0" stroke="#D9CBB2" stroke-width="5"/></g>
+ </g>
+ ${star('st0',700,1350,24,'#F3C766')}${star('st1',800,1400,18,C.paperHi)}${star('st2',690,1500,16,'#F3C766')}
+</g>
+
+<!-- SCENE 4: share a gem -->
+<g id="s3" opacity="0">
+ <rect width="1080" height="1920" fill="${C.paper}"/>
+ <g filter="url(#crayon)"><path d="M0,1600 Q500,1540 1080,1620 L1080,1920 L0,1920 Z" fill="#FBFBF9"/><path d="M0,1600 Q500,1540 1080,1620" stroke="#DCE3E3" stroke-width="12" fill="none"/></g>
+ <g id="bub">
+  <g filter="url(#crayon)"><path d="M150,640 Q150,560 230,560 L850,560 Q930,560 930,640 L930,1060 Q930,1140 850,1140 L560,1140 L470,1240 L480,1140 L230,1140 Q150,1140 150,1060 Z" fill="${C.paperHi}" stroke="${C.ink}" stroke-width="6"/></g>
+  <image href="../assets/submitted.webp" x="200" y="580" width="680" height="453"/>
+  <g id="chip"><g filter="url(#crayon)"><rect x="260" y="1040" width="560" height="78" rx="39" fill="${C.forestD}"/></g>
+   <text x="540" y="1092" text-anchor="middle" font-family="Source Sans 3" font-weight="700" font-size="34" fill="${C.paperHi}">Share a place · Dela en plats</text></g>
+ </g>
+ ${star('st3',140,520,30,C.berry)}${star('st4',960,500,24,C.blush)}${star('st5',990,1200,30,C.berry)}${star('st6',110,1250,20,C.blush)}
+ <g transform="translate(340 1900)">${hog('p4')}</g>
+ <g transform="translate(800 1890) scale(-.66 .66)">${hog('k4',1)}</g>
+</g>
+
+<!-- SCENE 5: end card -->
+<g id="s4" opacity="0">
+ <rect width="1080" height="1920" fill="${C.forestD}"/>
+ <g id="logoTile" transform="translate(540 520)">
+  <g filter="url(#crayon)"><rect x="-110" y="-110" width="220" height="220" rx="52" fill="${C.paper}"/></g>
+  <g transform="translate(-86 -86) scale(.134)"><path d="M180 188H1086V1090Q1086 1112 1070 1096L169 209Q153 188 180 188Z" stroke="#173E32" stroke-width="36" fill="none"/><clipPath id="logoCapB"><path d="M0 0H1280V1280L1049 1280L0 231Z"/></clipPath><circle cx="512" cy="743" r="110" fill="#B73548" clip-path="url(#logoCapB)"/><path d="M159 390V1110H879Z" fill="#173E32"/></g>
+ </g>
+ <g filter="url(#crayon)"><path d="M0,1600 Q540,1480 1080,1600 L1080,1920 L0,1920 Z" fill="${C.paper}"/></g>
+ <g transform="translate(390 1880) scale(.72)">${hog('p5')}</g>
+ <g transform="translate(700 1890) scale(-.5 .5)">${hog('k5',1)}</g>
+</g>
+<g id="snow" opacity="0">${snow}</g>
+<rect width="1080" height="1920" filter="url(#paper)" opacity=".55" pointer-events="none"/>
+`;
+
+/* ---------- captions ---------- */
+const caps=document.getElementById('caps');
+const CAPS=[
+ {id:'c1a',top:190,cls:'en',html:'Little places nearby,',a:.3,b:5.85},
+ {id:'c1b',top:290,cls:'en',html:'shared by parents.',a:.6,b:5.85},
+ {id:'c1c',top:410,cls:'sv',html:'Tipsade av andra föräldrar',a:1.0,b:5.85},
+ {id:'c2a',top:200,cls:'en',html:'Psst… what&#39;s in the tree?',a:6.4,b:9.4,size:70},
+ {id:'c2c',top:300,cls:'sv',html:'Psst… vad finns i trädet?',a:6.9,b:9.4},
+ {id:'c3a',top:250,cls:'en',html:'Found a gem? Share it.',a:15.3,b:18.95},
+ {id:'c3b',top:360,cls:'sv',html:'Hittat en pärla? Dela den.',a:15.8,b:18.95},
+ {id:'c4a',top:700,cls:'en',html:'Pocket Gem',a:19.6,b:99,col:'#F1E8E2'},
+ {id:'c4b',top:830,cls:'sv',html:'Little places. Big discoveries.<br>Små platser. Stora upptäckter.',a:20.1,b:99,col:'#E7AFA8',size:44},
+ {id:'c4c',top:1040,cls:'ui',html:'pocket-gem.hellopocketgem.workers.dev',a:20.6,b:99,col:'#F1E8E2',size:38,w:600},
+ {id:'c4d',top:1110,cls:'ui',html:'Free · Stockholm · English &amp; Svenska',a:20.9,b:99,col:'#E7AFA8',size:32,w:400},
+];
+for(const c of CAPS){const d=document.createElement('div');d.className='cap '+c.cls;d.id=c.id;d.style.top=c.top+'px';d.innerHTML=c.html.split('<br>').map(line=>line.split(' ').map(w=>`<span class="w">${w}</span>`).join(' ')).join('<br>');c.words=[...d.querySelectorAll('.w')];if(c.col)d.style.color=c.col;if(c.size)d.style.fontSize=c.size+'px';if(c.w)d.style.fontWeight=c.w;caps.appendChild(d);c.el=d}
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const setRot=(id,deg,cx,cy)=>$(id).setAttribute('transform',`rotate(${deg.toFixed(2)} ${cx} ${cy})`);
+function mouth(id,m){for(const k of ['smile','open','flat','frown','o'])$(id+'m_'+k).setAttribute('display',k===m?'inline':'none')}
+function eyes(id,t,off,sleepy){const ph=((t+off)%3.3);const s=sleepy?.45:(ph<.13?.1:1);$(id+'ey').setAttribute('transform',`translate(0 ${(-388*(1-s)).toFixed(1)}) scale(1 ${s})`);$(id+'lid').setAttribute('display',sleepy?'inline':'none')}
+const arm=(id,deg)=>setRot(id+'a',deg,40,-200);
+const head=(id,deg)=>setRot(id+'hd',deg,60,-330);
+const bob=(id,y,r=0)=>$(id+'b').setAttribute('transform',`translate(0 ${y.toFixed(1)}) rotate(${r.toFixed(2)} 0 0)`);
+const sit=(id,on)=>{$(id+'ft').setAttribute('display',on?'none':'inline');$(id+'fs').setAttribute('display',on?'inline':'none');$(id+'sh').setAttribute('display',on?'none':'inline')};
+const phone=(id,on)=>$(id+'ph').setAttribute('display',on?'inline':'none');
+const sw=(t,f,a)=>a*Math.sin(t*Math.PI*2*f);
+const breathe=(t,o)=>-Math.max(0,sw(t+o,.45,5));
+const hop=(t,f)=>-Math.abs(Math.sin(t*Math.PI*f))*18;
+
+/* ---------- frame ---------- */
+function render(t){
+ $('boil').setAttribute('seed',1+Math.floor(t*8)%5);
+ for(let i=0;i<5;i++){const a=sceneA(t,i);const g=$('s'+i);g.setAttribute('opacity',a.toFixed(3));g.setAttribute('display',a>0?'inline':'none')}
+
+
+ const so=Math.max(sceneA(t,2)*(1-.85*ease(prog(t,9.8,.6))*(t<15?1:0)),sceneA(t,3))*(1-.4*sceneA(t,4));$('snow').setAttribute('opacity',so.toFixed(3));$('snow').setAttribute('display',so>0?'inline':'none');
+ if(so>0)flakes.forEach((d,i)=>{const y=-20+((d.y0+t*d.sp)%1960);const x=d.x+Math.sin(t*1.1+d.ph)*24;$('sf'+i).setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)})`)});
+ // phone
+ if(t<6.7){
+  const st=prog(t,0,.9);$('phone').setAttribute('transform',`translate(0 ${(1-ease(st))*500}) rotate(${(1-ease(st))*6} 540 1150)`);
+  $('hand').setAttribute('transform',`translate(0 ${(1-ease(st))*500})`);
+  [1.0,1.3,1.6,1.9,2.2].forEach((a,i)=>{const p=back(prog(t,a,.45));const[x,y]=[[400,1040],[700,860],[560,1250],[650,1480],[360,1420]][i];$('pn'+i).setAttribute('transform',`translate(${x} ${y}) scale(${Math.max(p,0.001)})`)});
+  const pb=back(prog(t,2.7,.55));$('pnB').setAttribute('transform',`translate(690 1170) scale(${Math.max(pb*(1+.06*Math.sin(t*6)*(t>3.2?1:0)),.001)})`);
+  const g=(t*1.1)%1;$('pnBglow').setAttribute('r',(50+g*60).toFixed(1));$('pnBglow').setAttribute('opacity',(t>2.9?.55*(1-g):0).toFixed(2));
+  
+  const mp=(t*1.2)%1;$('mepulse').setAttribute('r',(20+mp*40).toFixed(1));$('mepulse').setAttribute('opacity',(.4*(1-mp)).toFixed(2));
+  const cp=back(prog(t,3.6,.6));$('card').setAttribute('transform',`translate(0 ${(1-cp)*420})`);
+  
+  const kp=ease(prog(t,2.0,.6));$('k2').setAttribute('transform',`translate(-40 ${-(kp*215)})`);
+  mouth('k2',t<3.7?'o':'open');head('k2',-8+sw(t,.8,4));arm('k2',-105+sw(t,2.2,14));eyes('k2',t,.4);bob('k2',t>3.7?hop(t-3.7,2.4):0);
+ }
+ // the secret in the tree
+ if(t>5.9&&t<15.7){
+  // sparkles in the hollow
+  for(let i=0;i<3;i++){const s=prog(t,6.3+i*.15,.3)*(1-prog(t,7.6,.4))*(.6+.4*Math.abs(Math.sin(t*4+i)));const el=$('st'+i);const tr=el.getAttribute('transform').split(' scale')[0];el.setAttribute('transform',tr+` scale(${Math.max(s,.001).toFixed(3)})`)}
+  // kid reaches in, pulls the jar out
+  const reach=ease(prog(t,6.9,.5)), pull=ease(prog(t,7.5,.8));
+  const jx=740+(660-740)*pull, jy=1450+(1640-1450)*pull-Math.sin(pull*Math.PI)*60;
+  $('jarT').setAttribute('transform',`translate(${jx.toFixed(1)} ${jy.toFixed(1)}) scale(${(.8+.2*pull).toFixed(3)}) rotate(${(Math.sin(pull*Math.PI)*-10).toFixed(1)})`);
+  $('jarShade').setAttribute('opacity',(.55*(1-pull)).toFixed(3));
+  // lid twists off
+  const lid=ease(prog(t,8.6,.6));$('lid').setAttribute('transform',`translate(${(-90*lid).toFixed(1)} ${(-70*lid+40*lid*lid).toFixed(1)}) rotate(${(-200*lid).toFixed(1)} 0 -71)`);$('lid').setAttribute('opacity',(1-prog(t,9.1,.3)).toFixed(2));
+  // the rolled note rises out and flies up, then unrolls
+  const rise=prog(t,9.2,.6);$('scrollIn').setAttribute('display',rise>0?'none':'inline');
+  const fx=jx+(540-jx)*ease(rise), fy=(jy-30)+(440-(jy-30))*ease(rise);
+  $('scrollFly').setAttribute('display',rise>0&&t<9.85?'inline':'none');
+  $('scrollFly').setAttribute('transform',`translate(${fx.toFixed(1)} ${fy.toFixed(1)}) rotate(${(90*ease(rise)).toFixed(1)}) scale(${(1+.4*ease(rise)).toFixed(3)})`);
+  const un=ease(prog(t,9.8,.9));const h=900*un;
+  $('noteRect').setAttribute('height',h.toFixed(1));$('note').setAttribute('display',t>9.8?'inline':'none');
+  $('roll').setAttribute('transform',`translate(0 ${(430+h).toFixed(1)})`);$('roll').setAttribute('opacity',(1-prog(t,10.7,.25)).toFixed(2));
+  const st=prog(t,13.0,.35);$('stamp').setAttribute('transform',`translate(760 1260) rotate(${(-14).toFixed(1)}) scale(${(st<=0?0.001:2.2-1.2*easeOut(st)).toFixed(3)})`);$('stamp').setAttribute('opacity',(st>0?Math.min(1,st*3):0).toFixed(2));
+  // hedgehogs
+  arm('k3',t<6.9?10:(t<8.3?10-reach*120+pull*40:-70+sw(t,1.2,6)));
+  mouth('k3',t<6.4?'smile':(t<9.8?'o':'open'));eyes('k3',t,.9);head('k3',t<9.8?-8:-14);bob('k3',t>13.1&&t<15?hop(t-13.1,2.4):breathe(t,.4));
+  mouth('p3',t<9.8?'smile':'open');eyes('p3',t,2);head('p3',t<9.8?2:-8);arm('p3',10+sw(t,.5,4));bob('p3',breathe(t,0));
+ }
+ // share
+ if(t>14.9&&t<19.7){
+  const bp=back(prog(t,15.6,.6));$('bub').setAttribute('transform',`translate(470 1240) scale(${Math.max(bp,.001)}) translate(-470 -1240)`);
+  const cp=back(prog(t,16.8,.5));$('chip').setAttribute('transform',`translate(540 1079) scale(${Math.max(cp,.001)}) translate(-540 -1079)`);
+  const k=ease(prog(t,15.1,.4));arm('k4',10-k*128);mouth('k4',t<15.6?'o':'open');head('k4',4+sw(t,1,3));eyes('k4',t,.2);bob('k4',t>16.8?hop(t-16.8,2.2):0);
+  arm('p4',10-ease(prog(t,15.4,.5))*108);phone('p4',1);mouth('p4','smile');head('p4',6);eyes('p4',t,1.1);bob('p4',breathe(t,.3));
+  for(let i=3;i<7;i++){const s=prog(t,15.8+(i-3)*.15,.3)*(.6+.4*Math.abs(Math.sin(t*2.8+i)));const el=$('st'+i);const tr=el.getAttribute('transform').split(' scale')[0];el.setAttribute('transform',tr+` scale(${Math.max(s,.001).toFixed(3)})`)}
+ }
+ // end card
+ if(t>18.9){
+  const lp=back(prog(t,19.3,.6));$('logoTile').setAttribute('transform',`translate(540 520) scale(${Math.max(lp,.001)})`);
+  arm('p5',-128+sw(t,1.5,18));arm('k5',-128-sw(t,1.8,18));mouth('p5','smile');mouth('k5','open');head('p5',4);head('k5',-4+sw(t,.9,3));eyes('p5',t,.5);eyes('k5',t,1.8);bob('k5',hop(t-19,1.8)*.7);bob('p5',breathe(t,0));
+ }
+ // captions
+ for(const c of CAPS){
+  if(t<c.a-.05||t>c.b+.5){c.el.style.opacity=0;continue}
+  const out=c.b>50?0:easeIn(prog(t,c.b,.45));
+  c.el.style.opacity=(1-out).toFixed(3);c.el.style.transform=`translateY(${(-14*out).toFixed(2)}px)`;
+  c.words.forEach((w,i)=>{const p=prog(t,c.a+i*.075,.75);const e=easeOut(p);
+   w.style.opacity=Math.min(1,p*1.6).toFixed(3);w.style.transform=`translateY(${(22*(1-e)).toFixed(2)}px)`;w.style.filter=p<1?`blur(${(5*(1-e)).toFixed(2)}px)`:'none'})
+ }
+}
+window.renderAt=t=>{render(t);return true};
+
+/* ---------- live player ---------- */
+const params=new URLSearchParams(location.search);
+function fit(){const w=innerWidth,h=innerHeight;const s=Math.min(w/1080,h/1920);const el=$('wrap');el.style.transform=`scale(${s}) translate(-540px,-960px)`}
+if(params.has('render')){document.body.classList.add('render');$('wrap').style.cssText='left:0;top:0';render(0)}
+else{fit();addEventListener('resize',fit);render(0);
+ let t0=null;const mus=$('music');
+ const loop=now=>{if(t0===null)t0=now;let t=(now-t0)/1000;if(t>DUR+1.5){t0=now;t=0;try{mus.currentTime=0;mus.play()}catch(e){}}render(Math.min(t,DUR));$('bar').style.width=(100*Math.min(t,DUR)/DUR)+'%';requestAnimationFrame(loop)};
+ $('play').addEventListener('click',()=>{$('play').style.display='none';try{mus.currentTime=0;const p=mus.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}requestAnimationFrame(loop)});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocket Gem — the bee garden</title>
+<style>
+@font-face{font-family:Lora;src:url(../assets/Lora-Variable.woff) format('woff');font-weight:400 700;font-style:normal}
+@font-face{font-family:Lora;src:url(../assets/Lora-Italic-Variable.woff) format('woff');font-weight:400 700;font-style:italic}
+@font-face{font-family:'Source Sans 3';src:url(../assets/SourceSans3-Variable.woff) format('woff');font-weight:200 900}
+html,body{margin:0;height:100%;background:#10251B;overflow:hidden}
+#wrap{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}
+#stage{position:absolute;inset:0;overflow:hidden;background:#F1E8E2}
+#stage svg{position:absolute;inset:0}
+.cap{position:absolute;left:90px;right:90px;text-align:center;font-family:Lora,serif;font-weight:600;color:#10251B;opacity:0}.cap .w{display:inline-block;opacity:0}
+.en{font-size:84px;line-height:1.05;text-wrap:balance}
+.sv{font-style:italic;font-weight:500;font-size:46px;color:#6B2E2B}
+.ui{font-family:'Source Sans 3',sans-serif}
+#play{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,37,27,.55);border:0;cursor:pointer;color:#F1E8E2;font:600 22px 'Source Sans 3',sans-serif;flex-direction:column;gap:16px;width:100%}
+#play span.btn{width:96px;height:96px;border-radius:50%;background:#D90A24;display:flex;align-items:center;justify-content:center}
+#bar{position:fixed;left:0;bottom:0;height:4px;background:#D90A24;width:0}
+body.render #play,body.render #bar{display:none}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+<svg id="svg" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<div id="caps"></div>
+</div></div>
+<button id="play" type="button" aria-label="Play the film"><span class="btn"><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#FBF6F1"/></svg></span><span>Play · Spela</span></button>
+<div id="bar"></div>
+<audio id="music" src="music.mp3?v=1" preload="auto"></audio>
+<script>
+const DUR = 23.2;
+const C = {paper:'#F1E8E2',paperHi:'#FBF6F1',paperLo:'#EADDD3',blush:'#E7AFA8',blushLo:'#EFD9CF',forest:'#173E32',forestD:'#10251B',berry:'#D90A24',berryD:'#B73548',ink:'#34271F',inkSoft:'#5C4A3E',plum:'#6B2E2B',skin:'#EEC3A3'};
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const easeOut=x=>{x=clamp(x);return 1-Math.pow(1-x,3)};const easeIn=x=>{x=clamp(x);return x*x*x};
+const ease=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+const back=x=>{x=clamp(x);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const prog=(t,a,d)=>clamp((t-a)/d);
+// scene windows [start,end] with 0.5 s crossfades
+const SC=[[-3,-2],[0,6.5],[6,15.5],[15,19.5],[19,23.2]];
+const sceneA=(t,i)=>{const[a,b]=SC[i];if(t<a||t>b+.02)return 0;return a<=0?1:ease(clamp((t-a)/.5))};
+
+/* ---------- hedgehog characters (facing right; origin = ground under body) ---------- */
+const H={spD:'#3F3128',spM:'#6A5444',spL:'#A88D74',fur:'#E7C9A8',furD:'#D4AE88',belly:'#F4E0C8',paw:'#5C4A3E'};
+function spikes(cx,cy,rx,ry,a0,a1,n,tip,col){let d='';const P=a=>[cx+rx*Math.cos(a),cy-ry*Math.sin(a)];
+ for(let i=0;i<=n;i++){const a=(a0+(a1-a0)*i/n)*Math.PI/180;const[x,y]=P(a);d+=(i?'L':'M')+x.toFixed(1)+','+y.toFixed(1);
+  if(i<n){const am=(a0+(a1-a0)*(i+.5)/n)*Math.PI/180;const k=tip*(i%2?0.94:1.06);d+='L'+(cx+rx*k*Math.cos(am)).toFixed(1)+','+(cy-ry*k*Math.sin(am)).toFixed(1)}}
+ return d}
+function mantle(id,kid){const top=kid?60:62;
+ const outer=spikes(-10,-262,178,248,255,top,22,1.2,'');
+ const end=[-10+178*Math.cos(top*Math.PI/180),-262-248*Math.sin(top*Math.PI/180)];
+ const inner=`C${kid?-5:5},-385 -22,-150 -56,-22 Z`;
+ const mid=spikes(-14,-258,160,226,250,top+4,20,1.12,'');
+ let quills='';for(let i=0;i<26;i++){const a=(245-i*7)*Math.PI/180;const r=.62+((i*37)%10)/40;const x=-30+150*r*Math.cos(a),y=-262-215*r*Math.sin(a);const ang=Math.atan2(-Math.sin(a),Math.cos(a));quills+=`M${x.toFixed(1)},${y.toFixed(1)} l${(Math.cos(ang)*26).toFixed(1)},${(Math.sin(ang)*26).toFixed(1)} `}
+ return `<path d="${outer}${inner}" fill="${H.spD}"/><path d="${mid}${inner}" fill="${H.spM}"/><path d="${quills}" stroke="${H.spL}" stroke-width="5" stroke-linecap="round" fill="none" clip-path="url(#mclip${id})"/><clipPath id="mclip${id}"><path d="${mid}${inner}"/></clipPath>`}
+function hog(id,kid){
+ const scarf=kid?C.blush:C.forest, stripe=kid?C.berry:C.blush;
+ const eyeR=kid?[13,17]:[11,14];
+ return `
+<g id="${id}">
+ <ellipse cx="20" cy="4" rx="${kid?150:170}" ry="20" fill="${C.ink}" opacity=".12" id="${id}sh"/>
+ <g id="${id}b"><g filter="url(#crayon)">
+  <ellipse cx="0" cy="-250" rx="150" ry="228" fill="${H.fur}"/>
+  <ellipse cx="10" cy="-62" rx="128" ry="42" fill="${H.furD}" opacity=".7"/>
+  <ellipse cx="62" cy="-168" rx="84" ry="116" fill="${H.belly}"/>
+  ${mantle(id,kid)}
+  <g id="${id}ft"><ellipse cx="-36" cy="-16" rx="44" ry="21" fill="${H.paw}"/><ellipse cx="62" cy="-16" rx="44" ry="21" fill="${H.paw}"/></g>
+  <g id="${id}fs" display="none"><ellipse cx="128" cy="-46" rx="40" ry="22" fill="${H.paw}"/><ellipse cx="168" cy="-30" rx="40" ry="22" fill="${H.paw}"/></g>
+  <g id="${id}hd">
+   <circle cx="50" cy="-448" r="27" fill="${H.fur}"/><circle cx="52" cy="-446" r="13" fill="${C.blush}"/>
+   <path d="M90,-418 C150,-418 206,-374 224,-352 C232,-340 222,-328 208,-328 C168,-326 128,-316 96,-298 Z" fill="${H.fur}"/>
+   <circle cx="222" cy="-346" r="16" fill="${C.ink}"/><circle cx="216" cy="-352" r="4.5" fill="${C.paperHi}"/>
+   <ellipse cx="150" cy="-346" rx="21" ry="12" fill="${C.blush}" opacity=".85"/>
+   <g id="${id}ey"><ellipse cx="128" cy="-388" rx="${eyeR[0]}" ry="${eyeR[1]}" fill="${C.ink}"/><circle cx="${kid?133:131}" cy="${kid?-394:-393}" r="${kid?5:4}" fill="${C.paperHi}"/></g>
+   <path id="${id}lid" d="M112,-396 Q128,-380 146,-396" stroke="${C.ink}" stroke-width="5" fill="none" stroke-linecap="round" display="none"/>
+   ${mouths(id,182,-318,kid?.8:.9)}
+   ${kid?`<g><path d="M-30,-452 C-34,-560 128,-566 124,-456 Z" fill="${C.berry}"/><path d="M-6,-468 L-2,-540 M30,-466 L32,-552 M66,-466 L66,-552 M100,-470 L98,-540" stroke="${C.berryD}" stroke-width="7" stroke-linecap="round"/><rect x="-40" y="-474" width="172" height="34" rx="17" fill="${C.berryD}"/><circle cx="46" cy="-572" r="28" fill="${C.paperHi}"/></g>`:''}
+  </g>
+  <path d="M-14,-322 Q70,-292 156,-316 L158,-276 Q70,-252 -16,-284 Z" fill="${scarf}"/>
+  <path d="M10,-310 L14,-282 M50,-302 L52,-272 M90,-300 L92,-270 M130,-306 L132,-276" stroke="${stripe}" stroke-width="7"/>
+  <path d="M96,-290 L86,-180 L122,-176 L128,-288 Z" fill="${scarf}"/><path d="M88,-176 L84,-158 M100,-174 L98,-156 M112,-174 L112,-156 M122,-174 L124,-158" stroke="${scarf}" stroke-width="6" stroke-linecap="round"/>
+  <g id="${id}a" transform="rotate(10 40 -200)">
+   <rect x="22" y="-212" width="38" height="128" rx="19" fill="${H.furD}"/>
+   <g id="${id}ph" display="none"><rect x="10" y="-126" width="84" height="138" rx="14" fill="${C.ink}"/><rect x="19" y="-116" width="66" height="112" rx="8" fill="${C.paperHi}"/><circle cx="52" cy="-68" r="10" fill="${C.berry}"/></g>
+   <ellipse cx="41" cy="-84" rx="24" ry="20" fill="${H.paw}"/>
+  </g>
+ </g></g>
+</g>`}
+function mouths(id,x,y,s){return `<g transform="translate(${x} ${y}) scale(${s})">
+ <path id="${id}m_smile" d="M-16,-4 Q2,14 18,-6" stroke="${C.ink}" stroke-width="5" fill="none" stroke-linecap="round"/>
+ <path id="${id}m_open" d="M-16,-6 Q2,30 20,-8 Z" fill="${C.plum}" stroke="${C.ink}" stroke-width="4" stroke-linejoin="round" display="none"/>
+ <path id="${id}m_flat" d="M-12,2 L14,0" stroke="${C.ink}" stroke-width="5" stroke-linecap="round" display="none"/>
+ <path id="${id}m_frown" d="M-14,8 Q2,-4 16,6" stroke="${C.ink}" stroke-width="5" fill="none" stroke-linecap="round" display="none"/>
+ <ellipse id="${id}m_o" cx="2" cy="4" rx="9" ry="12" fill="${C.plum}" stroke="${C.ink}" stroke-width="4" display="none"/>
+</g>`}
+
+const HN={gold:'#E8A93B',goldL:'#F3C766',goldD:'#C98A2B',wax:'#F3E2A8',waxL:'#FAF0CC',wood:'#B07A52',woodL:'#C9966C',suit:'#FBF6F1',seam:'#DCD3CC',glove:'#E3C27A',hare:'#C9B29A',hareL:'#EADBC8',veil:'#34271F'};
+const beeSVG=(id)=>`<g id="${id}"><g id="${id}f"><ellipse cx="-4" cy="-16" rx="13" ry="17" fill="#FFFFFF" opacity=".85" id="${id}w1"/><ellipse cx="10" cy="-14" rx="11" ry="15" fill="#FFFFFF" opacity=".75" id="${id}w2"/>
+ <ellipse cx="0" cy="0" rx="24" ry="17" fill="#F2C14E"/><path d="M-8,-15 Q-12,0 -8,15 M4,-16 Q0,0 4,16" stroke="${C.ink}" stroke-width="6" fill="none"/>
+ <circle cx="18" cy="-3" r="4" fill="${C.ink}"/><path d="M-24,0 l-9,2" stroke="${C.ink}" stroke-width="4" stroke-linecap="round"/></g></g>`;
+const BEES=[];for(let i=0;i<9;i++)BEES.push({cx:560+((i*83)%260)-60,cy:1180+((i*61)%300),ax:120+(i*29)%110,ay:60+(i*17)%70,fx:.23+(i%4)*.06,fy:.37+(i%3)*.08,ph:i*1.9});
+const pin=(x,y,id,img)=>`<g id="${id}" transform="translate(${x} ${y})"><g filter="url(#crayon)"><path d="M0,0 C-10,-26 -40,-46 -40,-78 A40,40 0 1 1 40,-78 C40,-46 10,-26 0,0 Z" fill="${C.berry}" stroke="${C.ink}" stroke-width="4"/><circle cx="0" cy="-78" r="27" fill="${C.paperHi}"/></g><image href="../assets/${img}.webp" x="-23" y="-101" width="46" height="46"/></g>`;
+const star=(id,x,y,r,col)=>`<path id="${id}" transform="translate(${x} ${y})" d="M0,-${r} Q${r*.18},-${r*.18} ${r},0 Q${r*.18},${r*.18} 0,${r} Q-${r*.18},${r*.18} -${r},0 Q-${r*.18},-${r*.18} 0,-${r} Z" fill="${col}"/>`;
+
+/* ---------- rain drops ---------- */
+let rain='';const drops=[];for(let i=0;i<40;i++){const d={x:200+((i*97)%680),y0:(i*173)%640,r:5+(i*7)%7,ph:i*1.7,sp:70+(i*13)%60};drops.push(d);rain+=`<circle id="rd${i}" r="${d.r}" fill="#FFFFFF"/>`}
+let snow='';const flakes=[];for(let i=0;i<70;i++){const d={x:(i*151)%1080,y0:(i*263)%1960,r:5+(i*5)%9,ph:i*2.3,sp:80+(i*17)%90};flakes.push(d);snow+=`<circle id="sf${i}" r="${d.r}" fill="#FFFFFF" stroke="#C9D3D6" stroke-width="2" opacity="${.75+((i*3)%4)*.08}"/>`}
+
+/* ---------- build ---------- */
+const svg=document.getElementById('svg');
+svg.innerHTML=`
+<defs>
+ <filter id="crayon" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+  <feTurbulence id="boil" type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="1" result="n"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G" result="d"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="1" seed="7" result="g"/>
+  <feColorMatrix in="g" type="matrix" values="0 0 0 0 .984  0 0 0 0 .965  0 0 0 0 .945  0 0 0 2.2 -1.15" result="spk"/>
+  <feComposite in="spk" in2="d" operator="atop"/>
+ </filter>
+ <filter id="paper" x="0" y="0" width="100%" height="100%">
+  <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4"/>
+  <feColorMatrix type="matrix" values="0 0 0 0 .2  0 0 0 0 .15  0 0 0 0 .1  0 0 0 -.9 .55"/>
+ </filter>
+ <clipPath id="winClip"><rect x="200" y="560" width="680" height="600" rx="10"/></clipPath>
+ <clipPath id="scrClip"><rect x="264" y="634" width="552" height="1032" rx="50"/></clipPath>
+</defs>
+
+<g id="s0" display="none"></g>
+
+<!-- SCENE 2: phone -->
+<g id="s1" opacity="0">
+ <rect width="1080" height="1920" fill="${C.blushLo}"/>
+ <g id="phone">
+  <g filter="url(#crayon)"><rect x="240" y="610" width="600" height="1080" rx="72" fill="${C.ink}"/></g>
+  <g clip-path="url(#scrClip)">
+   <rect x="264" y="634" width="552" height="1032" fill="${C.paperLo}"/>
+   <g filter="url(#crayon)">
+    <path d="M264,900 Q380,860 420,950 T560,1000 Q640,1040 600,1160 T720,1330 Q820,1380 816,1460 L816,1666 L264,1666 Z" fill="none"/>
+    <ellipse cx="370" cy="1050" rx="120" ry="90" fill="#9DB5A0"/>
+    <ellipse cx="700" cy="860" rx="140" ry="100" fill="#9DB5A0"/>
+    <ellipse cx="640" cy="1480" rx="170" ry="110" fill="#9DB5A0"/>
+    <path d="M264,1240 Q420,1180 520,1260 T816,1210" stroke="${C.blush}" stroke-width="34" fill="none" stroke-linecap="round"/>
+    <path d="M300,760 Q450,820 520,1100 T460,1600" stroke="${C.paperHi}" stroke-width="16" fill="none"/>
+    <path d="M816,1000 Q640,1080 560,1360" stroke="${C.paperHi}" stroke-width="12" fill="none"/>
+   </g>
+   <g id="pins">${pin(400,1040,'pn0','cat-playground')}${pin(700,860,'pn1','cat-forest')}${pin(560,1250,'pn2','cat-cafe')}${pin(650,1480,'pn3','cat-animals')}${pin(360,1420,'pn4','cat-museum')}<g id="pnB" transform="translate(690 1170)"><circle id="pnBglow" cx="0" cy="-80" r="70" fill="#F3C766" opacity=".5"/><g filter="url(#crayon)"><path d="M0,0 C-12,-30 -48,-54 -48,-92 A48,48 0 1 1 48,-92 C48,-54 12,-30 0,0 Z" fill="${HN.gold}"/><circle cx="0" cy="-92" r="33" fill="${C.paperHi}"/></g><g transform="translate(0 -90) scale(.95)">${beeSVG('pinbee')}</g></g></g>
+   <g id="me"><circle cx="520" cy="1160" r="34" fill="${C.berry}" opacity=".25" id="mepulse"/><circle cx="520" cy="1160" r="15" fill="${C.berry}" stroke="${C.paperHi}" stroke-width="5"/></g>
+   <rect x="264" y="634" width="552" height="120" fill="${C.paperHi}"/>
+   <g transform="translate(296 668) scale(.04)"><clipPath id="logoCapA"><path d="M0 0H1280V1280L1049 1280L0 231Z"/></clipPath><path d="M180 188H1086V1090Q1086 1112 1070 1096L169 209Q153 188 180 188Z" stroke="#173E32" stroke-width="60" fill="none"/><circle cx="512" cy="743" r="110" fill="#B73548" clip-path="url(#logoCapA)"/><path d="M159 390V1110H879Z" fill="#173E32"/></g>
+   <text x="352" y="712" font-family="Lora" font-weight="600" font-size="34" fill="${C.forestD}">Pocket Gem</text>
+   <g id="card" transform="translate(0 420)">
+    <rect x="284" y="1330" width="512" height="320" rx="30" fill="${C.paperHi}" stroke="${C.ink}" stroke-opacity=".2" stroke-width="2"/>
+    <g filter="url(#crayon)"><rect x="330" y="1372" width="170" height="44" rx="6" fill="#4E6F5F"/><rect x="330" y="1416" width="170" height="44" rx="6" fill="${C.blush}"/><path d="M318,1372 L512,1372 L496,1350 L334,1350 Z" fill="${C.paperHi}"/><rect x="390" y="1446" width="50" height="8" rx="4" fill="${C.ink}"/>
+     <rect x="560" y="1370" width="70" height="88" rx="14" fill="${C.paperHi}"/><rect x="560" y="1400" width="70" height="58" rx="12" fill="${HN.gold}"/><rect x="556" y="1360" width="78" height="20" rx="6" fill="${C.berry}"/></g>
+    <g transform="translate(680 1380) scale(.9)">${beeSVG('cardbee')}</g>
+    <text x="350" y="1550" font-family="Lora" font-weight="600" font-size="38" fill="${C.forestD}">Bee garden · Bigård</text>
+    <text x="350" y="1596" font-family="Source Sans 3" font-weight="600" font-size="28" fill="${C.inkSoft}">2 km · Bees, honey &amp; wax</text>
+   </g>
+  </g>
+ </g>
+ <g transform="translate(140 2130)">${hog('k2',1)}</g>
+ <g id="hand" filter="url(#crayon)">
+  <path d="M930,1920 L842,1560 Q832,1500 880,1488 L950,1496 Q1000,1520 1030,1920 Z" fill="${H.furD}"/>
+  <path d="M900,1660 L960,1640 M916,1740 L990,1716" stroke="${H.fur}" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="868" cy="1470" rx="46" ry="38" fill="${H.paw}"/>
+  <circle cx="830" cy="1424" r="17" fill="${H.paw}"/><circle cx="822" cy="1462" r="17" fill="${H.paw}"/><circle cx="828" cy="1500" r="17" fill="${H.paw}"/>
+ </g>
+</g>
+
+<!-- SCENE 3: bee garden -->
+<g id="s2" opacity="0">
+ <defs>
+  <pattern id="hexG" width="36" height="31.2" patternUnits="userSpaceOnUse"><rect width="36" height="31.2" fill="${HN.gold}"/><path d="M9,0 L27,0 L36,15.6 L27,31.2 L9,31.2 L0,15.6 Z" fill="${HN.goldL}" stroke="${HN.goldD}" stroke-width="3"/></pattern>
+  <pattern id="hexW" width="36" height="31.2" patternUnits="userSpaceOnUse"><rect width="36" height="31.2" fill="${HN.wax}"/><path d="M9,0 L27,0 L36,15.6 L27,31.2 L9,31.2 L0,15.6 Z" fill="${HN.waxL}" stroke="#E2C77E" stroke-width="3"/></pattern>
+  <clipPath id="capClip"><rect id="capRect" x="434" y="0" width="300" height="3000"/></clipPath>
+  <clipPath id="boxClip"><rect x="0" y="0" width="1080" height="1424"/></clipPath>
+  <clipPath id="jarClip"><rect x="392" y="1540" width="116" height="104" rx="18"/></clipPath>
+ </defs>
+ <rect width="1080" height="1920" fill="#F6EBDD"/>
+ <g filter="url(#crayon)"><circle cx="900" cy="640" r="84" fill="#F5D776"/></g>
+ <g filter="url(#crayon)">
+  <path d="M0,1180 Q300,1120 620,1170 T1080,1150 L1080,1920 L0,1920 Z" fill="#B7C9AE"/>
+  <rect x="40" y="930" width="300" height="250" fill="#9E3B30"/><path d="M20,940 L190,800 L360,940 Z" fill="${C.ink}"/>
+  <rect x="140" y="1040" width="70" height="140" fill="${C.paperHi}"/><rect x="152" y="1052" width="46" height="128" fill="#7E2E25"/>
+  <rect x="245" y="990" width="70" height="66" fill="${C.paperHi}"/><rect x="254" y="999" width="52" height="48" fill="#BFCFD0"/><path d="M280,999 L280,1047 M254,1023 L306,1023" stroke="${C.paperHi}" stroke-width="6"/>
+  <rect x="62" y="990" width="56" height="56" fill="${C.paperHi}"/><rect x="70" y="998" width="40" height="40" fill="#BFCFD0"/>
+  <ellipse cx="900" cy="1060" rx="120" ry="140" fill="#8FAE8A"/><rect x="892" y="1150" width="18" height="60" fill="${C.paperHi}"/>
+  <ellipse cx="1040" cy="1110" rx="90" ry="110" fill="#7FA07B"/>
+  <path d="M0,1520 Q420,1460 1080,1540 L1080,1920 L0,1920 Z" fill="#A3BB98"/>
+ </g>
+ <g id="flowers">${(()=>{let f='';for(let i=0;i<34;i++){const x=(i*131)%1080,y=1250+((i*97)%620),c=[C.blush,C.paperHi,'#A48BB8',C.berry][i%4];f+=`<g transform="translate(${x} ${y})"><path d="M0,0 L0,26" stroke="#6E8F68" stroke-width="5"/><circle cx="0" cy="0" r="${9+(i%3)*3}" fill="${c}"/><circle cx="0" cy="0" r="4" fill="#F2C14E"/></g>`}return f})()}</g>
+
+ <!-- beekeeper grandma (behind the hive) -->
+ <g id="gma" filter="url(#crayon)">
+  <rect x="756" y="1640" width="46" height="170" rx="20" fill="${HN.suit}"/><rect x="826" y="1640" width="46" height="170" rx="20" fill="${HN.suit}"/>
+  <ellipse cx="772" cy="1810" rx="40" ry="18" fill="${C.inkSoft}"/><ellipse cx="856" cy="1810" rx="40" ry="18" fill="${C.inkSoft}"/>
+  <path d="M720,1350 Q700,1330 740,1318 L880,1318 Q920,1330 900,1350 L928,1660 Q930,1690 900,1690 L720,1690 Q690,1690 692,1660 Z" fill="${HN.suit}"/>
+  <path d="M810,1330 L810,1680" stroke="${HN.seam}" stroke-width="5"/><rect x="836" y="1470" width="56" height="50" rx="8" fill="none" stroke="${HN.seam}" stroke-width="5"/>
+  <g id="gmaHead">
+   <path d="M772,1060 Q740,930 760,860 Q780,840 792,866 Q806,940 800,1060 Z" fill="${HN.hare}"/><path d="M774,1040 Q756,950 768,884 Q780,878 786,900 Q792,960 790,1040 Z" fill="${C.blush}"/>
+   <path d="M828,1060 Q850,930 880,872 Q902,860 904,888 Q890,960 856,1062 Z" fill="${HN.hare}"/><path d="M838,1040 Q856,960 878,900 Q888,898 888,914 Q874,970 852,1042 Z" fill="${C.blush}"/>
+   <ellipse cx="820" cy="1200" rx="86" ry="90" fill="${HN.hare}"/>
+   <ellipse cx="768" cy="1238" rx="44" ry="34" fill="${HN.hareL}"/>
+   <ellipse cx="742" cy="1222" rx="11" ry="9" fill="#D98C8C"/>
+   <path d="M742,1232 Q748,1250 764,1248" stroke="${C.ink}" stroke-width="4" fill="none" stroke-linecap="round"/>
+   <path d="M730,1240 l-46,-6 M732,1248 l-44,8" stroke="${C.inkSoft}" stroke-width="3" stroke-linecap="round"/>
+   <g id="gmaEye"><ellipse cx="790" cy="1184" rx="9" ry="12" fill="${C.ink}"/><circle cx="793" cy="1179" r="3.5" fill="${C.paperHi}"/></g>
+   <circle cx="790" cy="1186" r="25" fill="none" stroke="${C.inkSoft}" stroke-width="5"/><path d="M815,1180 L852,1172" stroke="${C.inkSoft}" stroke-width="5"/>
+   <ellipse cx="806" cy="1226" rx="18" ry="11" fill="${C.blush}" opacity=".9"/>
+   <path d="M690,1100 Q680,1260 740,1330 L900,1330 Q960,1260 950,1100 Z" fill="${HN.veil}" opacity=".26"/>
+   <path d="M700,1140 L946,1140 M698,1180 L948,1180 M700,1220 L948,1220 M708,1260 L940,1260 M722,1300 L924,1300 M740,1106 L750,1326 M790,1104 L794,1330 M840,1104 L842,1330 M890,1104 L886,1328" stroke="${HN.veil}" stroke-width="2" opacity=".35"/>
+   <ellipse cx="820" cy="1102" rx="164" ry="34" fill="#F1E2BE"/><path d="M738,1098 Q740,1022 820,1018 Q900,1022 902,1098 Z" fill="#F1E2BE"/><path d="M740,1084 Q820,1100 900,1084" stroke="${C.forest}" stroke-width="12" fill="none"/>
+   <path d="M772,1030 Q760,960 768,900 Q782,884 792,906 Q800,968 798,1030 Z" fill="${HN.hare}"/>
+   <path d="M832,1030 Q852,960 878,904 Q896,896 896,918 Q882,976 856,1032 Z" fill="${HN.hare}"/>
+  </g>
+ </g>
+
+ <!-- the comb frame (starts inside the hive) -->
+ <g clip-path="url(#boxClip)">
+ <g id="frame">
+  <g filter="url(#crayon)">
+   <rect x="-150" y="-95" width="300" height="190" rx="8" fill="${HN.wood}"/>
+   <rect x="-170" y="-105" width="340" height="24" rx="8" fill="${HN.woodL}"/>
+   <rect x="-136" y="-80" width="272" height="162" fill="url(#hexG)"/>
+  </g>
+  <g clip-path="url(#capClip)"><rect x="-136" y="-80" width="272" height="162" fill="url(#hexW)"/></g>
+  <path d="M-120,-60 Q-60,-70 0,-58 M-110,40 Q-40,30 30,44" stroke="#FFFFFF" stroke-width="7" opacity=".45" fill="none" stroke-linecap="round" id="gloss"/>
+ </g>
+ </g>
+
+ <!-- hive -->
+ <g filter="url(#crayon)">
+  <rect x="490" y="1700" width="20" height="110" fill="${HN.wood}"/><rect x="730" y="1700" width="20" height="110" fill="${HN.wood}"/>
+  <rect x="470" y="1690" width="300" height="24" rx="6" fill="${HN.woodL}"/>
+  <rect x="476" y="1556" width="288" height="136" rx="6" fill="#4E6F5F"/>
+  <rect x="476" y="1424" width="288" height="134" rx="6" fill="${C.blush}"/>
+  <rect x="580" y="1664" width="80" height="12" rx="6" fill="${C.ink}"/>
+  <path d="M476,1556 L764,1556" stroke="${C.ink}" stroke-width="4" opacity=".4"/>
+  <rect x="380" y="1648" width="140" height="22" rx="6" fill="${HN.woodL}"/><rect x="392" y="1668" width="16" height="142" fill="${HN.wood}"/><rect x="494" y="1668" width="16" height="142" fill="${HN.wood}"/>
+ </g>
+ <!-- honey jar on the stool -->
+ <g id="jar">
+  <g filter="url(#crayon)"><rect x="392" y="1540" width="116" height="108" rx="20" fill="#FFF7EA"/></g>
+  <g clip-path="url(#jarClip)"><rect id="honeyLevel" x="392" y="1640" width="116" height="120" fill="${HN.gold}"/><rect id="honeyHi" x="404" y="1640" width="14" height="120" fill="${HN.goldL}" opacity=".8"/></g>
+  <rect x="392" y="1540" width="116" height="108" rx="20" fill="none" stroke="${C.inkSoft}" stroke-width="5"/>
+  <path d="M410,1548 L410,1630" stroke="#FFFFFF" stroke-width="8" opacity=".6" stroke-linecap="round"/>
+ </g>
+ <g id="drips"></g>
+
+ <!-- hedgehogs -->
+ <g transform="translate(110 1840) scale(.95)">${hog('p3')}</g>
+ <g transform="translate(300 1830) scale(.66)">${hog('k3',1)}</g>
+
+ <!-- grandma's arms, fork and wax (in front) -->
+ <g id="arms" filter="url(#crayon)">
+  <path id="armB" d="" stroke="${HN.seam}" stroke-width="54" stroke-linecap="round" fill="none"/>
+  <path id="armB2" d="" stroke="${HN.suit}" stroke-width="44" stroke-linecap="round" fill="none"/>
+  <circle id="pawB" r="27" fill="${HN.glove}"/>
+  <g id="fork"><rect x="-6" y="0" width="12" height="120" rx="6" fill="${C.inkSoft}"/><rect x="-26" y="-30" width="52" height="34" rx="6" fill="#B9BEC0"/><path d="M-20,-30 l0,-26 M-10,-30 l0,-26 M0,-30 l0,-26 M10,-30 l0,-26 M20,-30 l0,-26" stroke="#9AA0A3" stroke-width="5" stroke-linecap="round"/>
+   <g id="waxCurl"><path d="M-40,-70 Q-10,-110 30,-80 Q60,-58 40,-40 Q10,-60 -20,-48 Q-44,-46 -40,-70 Z" fill="${HN.wax}"/><path d="M-30,-68 Q0,-92 28,-72" stroke="#E2C77E" stroke-width="4" fill="none"/><path d="M-20,-60 l10,8 M0,-70 l10,8 M18,-64 l8,8" stroke="#E2C77E" stroke-width="3"/></g>
+  </g>
+  <path id="armF" d="" stroke="${HN.seam}" stroke-width="54" stroke-linecap="round" fill="none"/>
+  <path id="armF2" d="" stroke="${HN.suit}" stroke-width="44" stroke-linecap="round" fill="none"/>
+  <circle id="pawF" r="27" fill="${HN.glove}"/>
+ </g>
+ <g id="bees">${BEES.map((b,i)=>beeSVG('bee'+i)).join('')}</g>
+ ${star('st0',470,1470,26,C.berry)}${star('st1',590,1420,20,C.goldL||'#F3C766')}${star('st2',420,1560,22,C.berry)}
+</g>
+
+<!-- SCENE 4: share a gem -->
+<g id="s3" opacity="0">
+ <rect width="1080" height="1920" fill="${C.paper}"/>
+ <g filter="url(#crayon)"><path d="M0,1600 Q500,1540 1080,1620 L1080,1920 L0,1920 Z" fill="#B7C9AE"/></g>
+ <g id="bub">
+  <g filter="url(#crayon)"><path d="M150,640 Q150,560 230,560 L850,560 Q930,560 930,640 L930,1060 Q930,1140 850,1140 L560,1140 L470,1240 L480,1140 L230,1140 Q150,1140 150,1060 Z" fill="${C.paperHi}" stroke="${C.ink}" stroke-width="6"/></g>
+  <image href="../assets/submitted.webp" x="200" y="580" width="680" height="453"/>
+  <g id="chip"><g filter="url(#crayon)"><rect x="260" y="1040" width="560" height="78" rx="39" fill="${C.forestD}"/></g>
+   <text x="540" y="1092" text-anchor="middle" font-family="Source Sans 3" font-weight="700" font-size="34" fill="${C.paperHi}">Share a place · Dela en plats</text></g>
+ </g>
+ ${star('st3',140,520,30,C.berry)}${star('st4',960,500,24,C.blush)}${star('st5',990,1200,30,C.berry)}${star('st6',110,1250,20,C.blush)}
+ <g transform="translate(340 1900)">${hog('p4')}</g>
+ <g transform="translate(800 1890) scale(-.66 .66)">${hog('k4',1)}</g>
+</g>
+
+<!-- SCENE 5: end card -->
+<g id="s4" opacity="0">
+ <rect width="1080" height="1920" fill="${C.forestD}"/>
+ <g id="logoTile" transform="translate(540 520)">
+  <g filter="url(#crayon)"><rect x="-110" y="-110" width="220" height="220" rx="52" fill="${C.paper}"/></g>
+  <g transform="translate(-86 -86) scale(.134)"><path d="M180 188H1086V1090Q1086 1112 1070 1096L169 209Q153 188 180 188Z" stroke="#173E32" stroke-width="36" fill="none"/><clipPath id="logoCapB"><path d="M0 0H1280V1280L1049 1280L0 231Z"/></clipPath><circle cx="512" cy="743" r="110" fill="#B73548" clip-path="url(#logoCapB)"/><path d="M159 390V1110H879Z" fill="#173E32"/></g>
+ </g>
+ <g filter="url(#crayon)"><path d="M0,1600 Q540,1480 1080,1600 L1080,1920 L0,1920 Z" fill="${C.paper}"/></g>
+ <g transform="translate(390 1880) scale(.72)">${hog('p5')}</g>
+ <g transform="translate(700 1890) scale(-.5 .5)">${hog('k5',1)}</g>
+</g>
+<g id="snow" opacity="0">${snow}</g>
+<rect width="1080" height="1920" filter="url(#paper)" opacity=".55" pointer-events="none"/>
+`;
+
+/* ---------- captions ---------- */
+const caps=document.getElementById('caps');
+const CAPS=[
+ {id:'c1a',top:190,cls:'en',html:'Little places nearby,',a:.3,b:5.85},
+ {id:'c1b',top:290,cls:'en',html:'shared by parents.',a:.6,b:5.85},
+ {id:'c1c',top:410,cls:'sv',html:'Tipsade av andra föräldrar',a:1.0,b:5.85},
+ {id:'c2a',top:200,cls:'en',html:'Little places.',a:6.5,b:9.0},
+ {id:'c2b',top:300,cls:'en',html:'Big discoveries.',a:7.0,b:9.0},
+ {id:'c2c',top:420,cls:'sv',html:'Små platser. Stora upptäckter.',a:7.5,b:9.0},
+ {id:'c2d',top:132,cls:'ui',html:'Did you know? · Visste du?',a:9.5,b:15.0,col:'#D90A24',size:44,w:700},
+ {id:'c2e',top:215,cls:'en',html:'Bees make wax with their own tummies!',a:9.7,b:12.3,size:72},
+ {id:'c2f',top:395,cls:'sv',html:'Bina gör vax med sina egna magar!',a:10.2,b:12.3,size:42},
+ {id:'c2g',top:215,cls:'en',html:'Then they seal the honey in with a wax lid.',a:12.75,b:15.0,size:72},
+ {id:'c2h',top:395,cls:'sv',html:'Sen förseglar de honungen med ett vaxlock.',a:13.2,b:15.0,size:42},
+ {id:'c3a',top:250,cls:'en',html:'Found a gem? Share it.',a:15.3,b:18.95},
+ {id:'c3b',top:360,cls:'sv',html:'Hittat en pärla? Dela den.',a:15.8,b:18.95},
+ {id:'c4a',top:700,cls:'en',html:'Pocket Gem',a:19.6,b:99,col:'#F1E8E2'},
+ {id:'c4b',top:830,cls:'sv',html:'Little places. Big discoveries.<br>Små platser. Stora upptäckter.',a:20.1,b:99,col:'#E7AFA8',size:44},
+ {id:'c4c',top:1040,cls:'ui',html:'pocket-gem.hellopocketgem.workers.dev',a:20.6,b:99,col:'#F1E8E2',size:38,w:600},
+ {id:'c4d',top:1110,cls:'ui',html:'Free · Stockholm · English &amp; Svenska',a:20.9,b:99,col:'#E7AFA8',size:32,w:400},
+];
+for(const c of CAPS){const d=document.createElement('div');d.className='cap '+c.cls;d.id=c.id;d.style.top=c.top+'px';d.innerHTML=c.html.split('<br>').map(line=>line.split(' ').map(w=>`<span class="w">${w}</span>`).join(' ')).join('<br>');c.words=[...d.querySelectorAll('.w')];if(c.col)d.style.color=c.col;if(c.size)d.style.fontSize=c.size+'px';if(c.w)d.style.fontWeight=c.w;caps.appendChild(d);c.el=d}
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const setRot=(id,deg,cx,cy)=>$(id).setAttribute('transform',`rotate(${deg.toFixed(2)} ${cx} ${cy})`);
+function mouth(id,m){for(const k of ['smile','open','flat','frown','o'])$(id+'m_'+k).setAttribute('display',k===m?'inline':'none')}
+function eyes(id,t,off,sleepy){const ph=((t+off)%3.3);const s=sleepy?.45:(ph<.13?.1:1);$(id+'ey').setAttribute('transform',`translate(0 ${(-388*(1-s)).toFixed(1)}) scale(1 ${s})`);$(id+'lid').setAttribute('display',sleepy?'inline':'none')}
+const arm=(id,deg)=>setRot(id+'a',deg,40,-200);
+const head=(id,deg)=>setRot(id+'hd',deg,60,-330);
+const bob=(id,y,r=0)=>$(id+'b').setAttribute('transform',`translate(0 ${y.toFixed(1)}) rotate(${r.toFixed(2)} 0 0)`);
+const sit=(id,on)=>{$(id+'ft').setAttribute('display',on?'none':'inline');$(id+'fs').setAttribute('display',on?'inline':'none');$(id+'sh').setAttribute('display',on?'none':'inline')};
+const phone=(id,on)=>$(id+'ph').setAttribute('display',on?'inline':'none');
+const sw=(t,f,a)=>a*Math.sin(t*Math.PI*2*f);
+const breathe=(t,o)=>-Math.max(0,sw(t+o,.45,5));
+const hop=(t,f)=>-Math.abs(Math.sin(t*Math.PI*f))*18;
+
+/* ---------- frame ---------- */
+function render(t){
+ $('boil').setAttribute('seed',1+Math.floor(t*8)%5);
+ for(let i=0;i<5;i++){const a=sceneA(t,i);const g=$('s'+i);g.setAttribute('opacity',a.toFixed(3));g.setAttribute('display',a>0?'inline':'none')}
+
+
+ $('snow').setAttribute('display','none');
+ // phone
+ if(t<6.7){
+  const st=prog(t,0,.9);$('phone').setAttribute('transform',`translate(0 ${(1-ease(st))*500}) rotate(${(1-ease(st))*6} 540 1150)`);
+  $('hand').setAttribute('transform',`translate(0 ${(1-ease(st))*500})`);
+  [1.0,1.3,1.6,1.9,2.2].forEach((a,i)=>{const p=back(prog(t,a,.45));const[x,y]=[[400,1040],[700,860],[560,1250],[650,1480],[360,1420]][i];$('pn'+i).setAttribute('transform',`translate(${x} ${y}) scale(${Math.max(p,0.001)})`)});
+  const pb=back(prog(t,2.7,.55));$('pnB').setAttribute('transform',`translate(690 1170) scale(${Math.max(pb*(1+.06*Math.sin(t*6)*(t>3.2?1:0)),.001)})`);
+  const g=(t*1.1)%1;$('pnBglow').setAttribute('r',(50+g*60).toFixed(1));$('pnBglow').setAttribute('opacity',(t>2.9?.55*(1-g):0).toFixed(2));
+  $('pinbee').setAttribute('transform',`translate(${(Math.sin(t*5)*4).toFixed(1)} ${(Math.cos(t*7)*3).toFixed(1)})`);
+  const mp=(t*1.2)%1;$('mepulse').setAttribute('r',(20+mp*40).toFixed(1));$('mepulse').setAttribute('opacity',(.4*(1-mp)).toFixed(2));
+  const cp=back(prog(t,3.6,.6));$('card').setAttribute('transform',`translate(0 ${(1-cp)*420})`);
+  $('cardbee').setAttribute('transform',`translate(${(Math.sin(t*4)*8).toFixed(1)} ${(Math.cos(t*6)*5).toFixed(1)})`);
+  const kp=ease(prog(t,2.0,.6));$('k2').setAttribute('transform',`translate(-40 ${-(kp*215)})`);
+  mouth('k2',t<3.7?'o':'open');head('k2',-8+sw(t,.8,4));arm('k2',-105+sw(t,2.2,14));eyes('k2',t,.4);bob('k2',t>3.7?hop(t-3.7,2.4):0);
+ }
+ // bee garden
+ if(t>5.9&&t<15.7){
+  // frame: rise out of the hive, then present
+  const r1=ease(prog(t,6.6,1.0)), r2=ease(prog(t,7.7,.6));
+  const fx=620-60*r2, fy=1500-250*r1-20*r2, fr=-6*r2;
+  $('frame').setAttribute('transform',`translate(${fx} ${fy}) rotate(${fr})`);
+  // uncapping: the wax lid disappears left -> right behind the fork
+  const sc=prog(t,8.1,1.3);const capX=-136+272*ease(sc);
+  $('capRect').setAttribute('x',(fx+capX*Math.cos(fr*Math.PI/180)).toFixed(1));
+  $('gloss').setAttribute('opacity',(.55*ease(sc)).toFixed(2));
+  // back arm holds the frame's right bar
+  const sB=[880,1350], pB=[fx+150*Math.cos(fr*Math.PI/180)+4, fy-20+150*Math.sin(fr*Math.PI/180)];
+  const tube=(s0,p,bend)=>`M${s0[0]},${s0[1]} Q${((s0[0]+p[0])/2+bend).toFixed(1)},${((s0[1]+p[1])/2+Math.abs(bend)).toFixed(1)} ${p[0].toFixed(1)},${p[1].toFixed(1)}`;
+  $('armB').setAttribute('d',tube(sB,pB,30));$('armB2').setAttribute('d',tube(sB,pB,30));$('pawB').setAttribute('cx',pB[0].toFixed(1));$('pawB').setAttribute('cy',pB[1].toFixed(1));
+  // front arm: rest -> sweep the fork across the comb -> offer the wax to the kid
+  const sF=[740,1352];let tip;
+  const sweepY=fy-62, offer=ease(prog(t,9.6,.9)), back2=ease(prog(t,13.6,.8));
+  if(t<8.0){const k=ease(prog(t,7.3,.7));tip=[700-100*k, 1500-(1500-sweepY)*k]}
+  else if(t<9.6){tip=[fx+capX, sweepY+Math.sin(t*14)*4]}
+  else{tip=[(fx+136)*(1-offer)+505*offer, sweepY*(1-offer)+1500*offer]; tip=[tip[0]+(fx+60-tip[0])*back2, tip[1]+(sweepY+40-tip[1])*back2]}
+  const fang=t<9.6?-12:-12+40*offer-40*back2;
+  const pF=[tip[0]+110*Math.sin((fang+180)*Math.PI/180)*-1, tip[1]+110*Math.cos(fang*Math.PI/180)];
+  $('fork').setAttribute('transform',`translate(${tip[0].toFixed(1)} ${tip[1].toFixed(1)}) rotate(${fang.toFixed(1)})`);
+  $('fork').setAttribute('display',t>7.3?'inline':'none');
+  const wc=t<8.1?0:(t<9.6?ease(sc):1)*(1-back2);$('waxCurl').setAttribute('transform',`scale(${Math.max(wc,.001).toFixed(3)})`);
+  const pF2=[tip[0]+Math.sin(-fang*Math.PI/180)*-110*-1, tip[1]+110*Math.cos(fang*Math.PI/180)];
+  const paw=[tip[0]-Math.sin(fang*Math.PI/180)*112, tip[1]+Math.cos(fang*Math.PI/180)*112];
+  $('armF').setAttribute('d',tube(sF,paw,-20));$('armF2').setAttribute('d',tube(sF,paw,-20));$('pawF').setAttribute('cx',paw[0].toFixed(1));$('pawF').setAttribute('cy',paw[1].toFixed(1));
+  setRot('gmaHead',t<9.6?-3+sw(t,.4,2):6*offer-6*back2,820,1300);
+  const gb=((t+.7)%3.6)<.13?.1:1;$('gmaEye').setAttribute('transform',`translate(0 ${(1184*(1-gb)).toFixed(1)}) scale(1 ${gb})`);
+  // honey drips into the jar
+  let dr='';const dx=fx-120;
+  for(let k=0;k<10;k++){const t0=9.3+k*.55;const p=(t-t0)/.55;if(p>0&&p<1){const y=fy+90+(1555-(fy+90))*p*p;dr+=`<path transform="translate(${dx} ${y.toFixed(1)})" d="M0,-16 C6,-6 10,0 10,6 A10,10 0 1 1 -10,6 C-10,0 -6,-6 0,-16 Z" fill="${HN.gold}"/>`}}
+  $('drips').innerHTML=dr;
+  const lvl=ease(prog(t,9.6,5.6));$('honeyLevel').setAttribute('y',(1640-62*lvl).toFixed(1));$('honeyHi').setAttribute('y',(1640-62*lvl).toFixed(1));
+  // bees
+  BEES.forEach((b,i)=>{const x=b.cx+Math.sin(t*b.fx*6.28+b.ph)*b.ax, y=b.cy+Math.sin(t*b.fy*6.28+b.ph*1.3)*b.ay;const vx=Math.cos(t*b.fx*6.28+b.ph);
+   $('bee'+i).setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${vx<0?-1:1} 1)`);const w=.5+.5*Math.abs(Math.sin(t*40+i));$('bee'+i+'w1').setAttribute('ry',(17*w).toFixed(1));$('bee'+i+'w2').setAttribute('ry',(15*w).toFixed(1))});
+  // hedgehogs
+  const touch=ease(prog(t,10.4,.4));
+  arm('k3',10-touch*95);mouth('k3',t<7.0?'smile':(t<10.5?'o':'open'));eyes('k3',t,.9);head('k3',t<10.5?-4+sw(t,.6,3):-10);bob('k3',t>10.9&&t<13?hop(t-10.9,2.4):breathe(t,.4));
+  mouth('p3',t<8?'smile':'open');eyes('p3',t,2);head('p3',sw(t,.4,3));arm('p3',10+sw(t,.5,4));bob('p3',breathe(t,0));
+  for(let i=0;i<3;i++){const s=prog(t,10.6+i*.12,.3)*(1-prog(t,12.6,.4))*(.6+.4*Math.abs(Math.sin(t*3+i)));const el=$('st'+i);const tr=el.getAttribute('transform').split(' scale')[0];el.setAttribute('transform',tr+` scale(${Math.max(s,.001).toFixed(3)})`)}
+ }
+ // share
+ if(t>14.9&&t<19.7){
+  const bp=back(prog(t,15.6,.6));$('bub').setAttribute('transform',`translate(470 1240) scale(${Math.max(bp,.001)}) translate(-470 -1240)`);
+  const cp=back(prog(t,16.8,.5));$('chip').setAttribute('transform',`translate(540 1079) scale(${Math.max(cp,.001)}) translate(-540 -1079)`);
+  const k=ease(prog(t,15.1,.4));arm('k4',10-k*128);mouth('k4',t<15.6?'o':'open');head('k4',4+sw(t,1,3));eyes('k4',t,.2);bob('k4',t>16.8?hop(t-16.8,2.2):0);
+  arm('p4',10-ease(prog(t,15.4,.5))*108);phone('p4',1);mouth('p4','smile');head('p4',6);eyes('p4',t,1.1);bob('p4',breathe(t,.3));
+  for(let i=3;i<7;i++){const s=prog(t,15.8+(i-3)*.15,.3)*(.6+.4*Math.abs(Math.sin(t*2.8+i)));const el=$('st'+i);const tr=el.getAttribute('transform').split(' scale')[0];el.setAttribute('transform',tr+` scale(${Math.max(s,.001).toFixed(3)})`)}
+ }
+ // end card
+ if(t>18.9){
+  const lp=back(prog(t,19.3,.6));$('logoTile').setAttribute('transform',`translate(540 520) scale(${Math.max(lp,.001)})`);
+  arm('p5',-128+sw(t,1.5,18));arm('k5',-128-sw(t,1.8,18));mouth('p5','smile');mouth('k5','open');head('p5',4);head('k5',-4+sw(t,.9,3));eyes('p5',t,.5);eyes('k5',t,1.8);bob('k5',hop(t-19,1.8)*.7);bob('p5',breathe(t,0));
+ }
+ // captions
+ for(const c of CAPS){
+  if(t<c.a-.05||t>c.b+.5){c.el.style.opacity=0;continue}
+  const out=c.b>50?0:easeIn(prog(t,c.b,.45));
+  c.el.style.opacity=(1-out).toFixed(3);c.el.style.transform=`translateY(${(-14*out).toFixed(2)}px)`;
+  c.words.forEach((w,i)=>{const p=prog(t,c.a+i*.075,.75);const e=easeOut(p);
+   w.style.opacity=Math.min(1,p*1.6).toFixed(3);w.style.transform=`translateY(${(22*(1-e)).toFixed(2)}px)`;w.style.filter=p<1?`blur(${(5*(1-e)).toFixed(2)}px)`:'none'})
+ }
+}
+window.renderAt=t=>{render(t);return true};
+
+/* ---------- live player ---------- */
+const params=new URLSearchParams(location.search);
+function fit(){const w=innerWidth,h=innerHeight;const s=Math.min(w/1080,h/1920);const el=$('wrap');el.style.transform=`scale(${s}) translate(-540px,-960px)`}
+if(params.has('render')){document.body.classList.add('render');$('wrap').style.cssText='left:0;top:0';render(0)}
+else{fit();addEventListener('resize',fit);render(0);
+ let t0=null;const mus=$('music');
+ const loop=now=>{if(t0===null)t0=now;let t=(now-t0)/1000;if(t>DUR+1.5){t0=now;t=0;try{mus.currentTime=0;mus.play()}catch(e){}}render(Math.min(t,DUR));$('bar').style.width=(100*Math.min(t,DUR)/DUR)+'%';requestAnimationFrame(loop)};
+ $('play').addEventListener('click',()=>{$('play').style.display='none';try{mus.currentTime=0;const p=mus.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}requestAnimationFrame(loop)});
+}
+</script>
+</body>
+</html>
