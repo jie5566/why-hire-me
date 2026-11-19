@@ -1010,17 +1010,20 @@ var CASES = {
     meta: [['Role', 'UX/UI designer'], ['Team', 'UX lead, CEO, AI and dev teams'], ['Time', '8 weeks'], ['Tools', 'Figma']],
     img: [['assets/amiqa-calendar-week.jpg', 'Amiqa front-desk calendar in week view: rooms as rows, colour-coded bookings, AI price suggestions in empty slots']],
     figs: [
-      ['assets/amiqa-sketch-sitemap.jpg', 'Hand-drawn sitemap: sign in, set goal, identify location, connect PMS and OTAs, room mapping, then the dashboard with calendar, reservations, inventory, guests, reports and configuration', 'Sitemap and onboarding flow, sketched with the CEO and UX lead. I reordered the setup steps.'],
+      ['assets/amiqa-sketch-sitemap.jpg', 'Hand-drawn sitemap: sign in, set goal, identify location, connect PMS and OTAs, room mapping, then the dashboard with calendar, reservations, inventory, guests, reports and configuration', 'Sitemap and onboarding flow, which I sketched myself, including reordering the setup steps.'],
       ['assets/amiqa-sketch-guest-card.jpg', 'Hand-drawn booking card and guest card, with a checklist of the fields a front desk needs', 'Booking and guest card: what the front desk needs to see, and what can wait.'],
-      ['assets/amiqa-calendar-month.jpg', 'Amiqa calendar zoomed out to a month', 'The same calendar zoomed out to a month.'],
-      ['assets/amiqa-signin.jpg', 'Amiqa sign-in screen over an aerial beach photo', 'Sign-in: the first screen of onboarding.']
+      ['assets/amiqa-calendar-2weeks.jpg', 'Amiqa calendar in two-week view with colour-coded bookings', 'The calendar over two weeks: bookings, maintenance and free nights at a glance.']
+    ],
+    figsEnd: [
+      ['assets/amiqa-signin.jpg', 'Amiqa sign-in screen over an aerial beach photo', 'Sign-in: the first screen of onboarding.'],
+      ['assets/amiqa-calendar-month.jpg', 'Amiqa calendar zoomed out to a month', 'Zoomed out to a full month, for planning ahead.']
     ],
     pairNatural: true,
     pair: [['assets/amiqa-sketch-calendar.jpg', 'Hand-drawn calendar page: rooms by weekday, booked blocks, an empty block showing a dynamic price suggestion on hover', 'Sketch · calendar with AI price on empty slots'], ['assets/amiqa-calendar-week.jpg', 'Final calendar interface with colour-coded bookings and price suggestions in empty slots', 'Interface · the sketch, built']],
     task: 'Amiqa had an AI dynamic-pricing tool, but existing hotel systems wouldn\'t integrate it. The company needed its own simple product where managers of small hotels (under 25 rooms) could handle availability, OTA connections and pricing in one place.',
     action: [
       'Met the AI team, engineers and leadership to map how pricing, booking platforms and hotel systems connect.',
-      'Defined the sitemap and onboarding flow with the CEO and UX lead, building on the OTA module engineering had already shipped.',
+      'Mapped the sitemap and onboarding flow myself, building on the OTA module engineering had already shipped, and reordered the setup steps so hotels connect their systems in a logical order.',
       'Made the <b>calendar</b> the core interaction, with AI price suggestions appearing in empty slots, so pricing decisions happen inside the daily workflow.',
       'Designed a colour-coded system for bookings, maintenance and availability.'
     ],
@@ -1182,6 +1185,7 @@ var CASES = {
     h += '<section><p class="case-k mono">A — Action</p><ul>' + c.action.map(function (a) { return '<li>' + a + '</li>'; }).join('') + '</ul></section>';
     if (c.figs) h += c.figs.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     if (c.pair) h += '<figure class="case-pair' + (c.pairNatural ? ' natural' : '') + '">' + c.pair.map(function (q) { return '<div><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
+    if (c.figsEnd) h += c.figsEnd.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     h += '<section><p class="case-k mono">L — Learning</p><p>' + c.learning + '</p></section>';
     h += '<section class="case-r"><p class="case-k mono">R — Result</p><ul>' + c.result.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></section>';
     if (c.links) h += '<p class="case-links">' + c.links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + ' ↗</a>'; }).join('') + '</p>';
