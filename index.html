@@ -333,6 +333,18 @@ html.case-open { overflow: hidden; }
 .case-fig { margin: 0; display: flex; flex-direction: column; gap: 8px; }
 .case-fig img { width: 100%; border-radius: 6px; background: var(--ph); }
 .case-fig figcaption { color: var(--soft); text-transform: none; letter-spacing: 0; font-size: 12px; }
+.arch { margin: 0; }
+.arch-row { display: grid; grid-template-columns: 1fr 3.2fr 1fr; gap: 10px; align-items: stretch; }
+.arch-local { border: 1px dashed var(--soft); border-radius: 10px; padding: 26px 10px 10px; position: relative; }
+.arch-cap { position: absolute; top: 8px; left: 12px; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+.arch-in { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 100%; }
+.arch-n { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+.arch-n span { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+.arch-n b { font-weight: 600; font-size: 14px; line-height: 1.35; }
+.arch-n.acc { border-color: var(--acc); }
+.arch-n.acc span { color: var(--acc); }
+.arch figcaption { margin-top: 10px; color: var(--soft); }
+@media (max-width: 760px) { .arch-row, .arch-in { grid-template-columns: 1fr; } .arch-local { padding-top: 10px; } .arch-cap { position: static; display: block; margin: 0 2px 10px; line-height: 1.4; } }
 .case-films { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .case-films > div { min-width: 0; }
 .case-films iframe { display: block; width: 100%; aspect-ratio: 9 / 16; border: 0; border-radius: 8px; background: #10251b; }
@@ -483,7 +495,7 @@ html.case-open { overflow: hidden; }
     <div class="ch-in">
       <p class="ch-num mono rv">03 / Build — front-end code</p>
       <h2 class="disp rv" id="code-h">I build what I design.</h2>
-      <p class="ch-body rv">JavaScript, HTML, CSS, Node and Express, and AI coding tools when speed matters. I prototype in real code, so ideas get tested by people instead of debated in meetings.</p>
+      <p class="ch-body rv">JavaScript, HTML, CSS, Node and Express, learned properly, not just generated. I know how a front end talks to a server and how an AI model sits behind an API, so I design within real technical limits and speak the same language as engineers. AI coding tools make me faster; they don't replace knowing what the code does.</p>
       <div class="cards">
         <a class="card wide rv" href="#easy-to-read">
 <div class="media e2r" role="img" aria-label="Illustration: a dense web article on the left is simplified by a local LLaMA 3.2 model into an Easy-to-Read version on the right, with a heading, short lines and clear steps. A toggle switches between original and simplified. 69% of 54 test users preferred the simplified version.">
@@ -495,9 +507,9 @@ html.case-open { overflow: hidden; }
             </div>
             <div class="vz-foot"><span class="cv-big disp">69%</span><span class="cv-sub mono">of 54 test users preferred the simplified version</span></div>
           </div>
-          <span class="tag mono">Accessibility · local LLM · built end to end</span>
+          <span class="tag mono">Accessibility · local LLM · coded end to end</span>
           <h3>Easy-to-Read: any web page, rewritten for people who struggle to read</h3>
-          <p>From research to a working tool. It runs a local LLM, so nothing a reader opens leaves their machine.</p>
+          <p>From research to a working tool I coded myself. It runs a local LLM, so nothing a reader opens leaves their machine.</p>
           <span class="more">Case study →</span>
         </a>
         <a class="card rv" href="#hackathon">
@@ -1135,17 +1147,19 @@ var CASES = {
   'easy-to-read': {
     kicker: 'Degree project · accessibility',
     title: 'Easy-to-Read: any web page, rewritten for people who struggle to read',
-    lead: 'A working tool that simplifies web content with a private, local LLM, tested with 63 people.',
+    lead: 'A working tool I designed and coded myself. It simplifies any web page with a private, local LLM, and was tested with 63 people.',
     chartSel: '.media.e2r', chartNote: 'Illustration of how the tool works, drawn for this portfolio.',
-    meta: [['Role', 'UX research, UX/UI, front-end'], ['Team', 'Solo, with academic supervision'], ['Time', '16 weeks'], ['Stack', 'Figma, Node.js, Express, Puppeteer, LLaMA 3.2 via Ollama']],
+    meta: [['Role', 'UX research, UX/UI, front-end and server code'], ['Team', 'Solo, with academic supervision'], ['Time', '16 weeks'], ['Stack', 'Figma, Node.js, Express, Puppeteer, LLaMA 3.2 via Ollama']],
     task: 'Accessibility tools help people reach content, not understand it. Could AI simplify any web page for people with reading difficulties without losing its meaning or their privacy?',
     action: [
       'Turned research, Easy-to-Read guidelines, surveys and interviews into four principles: clarity over compression, preserve meaning, structure aids understanding, reduce cognitive load.',
       'Designed a minimal flow: paste a URL, toggle between original and simplified. A toggle, not a split view, to cut overload and bias in testing.',
-      'Built it: Puppeteer extracts the text and LLaMA 3.2 runs locally via Ollama, so nothing leaves the device. A prompt I wrote from the E2R guidelines shapes the output.',
+      '<b>Wrote the code myself.</b> A Node.js and Express server; Puppeteer to open the page and pull out the readable text; LLaMA 3.2 running locally through Ollama\'s API, so nothing a reader opens leaves their machine.',
+      '<b>Treated the prompt as part of the product.</b> Turned the Easy-to-Read guidelines into a structured prompt: short sentences, simple words, clear structure, and no meaning lost.',
       'Ran an A/B test with 54 people and a usability test with 9 people with reading difficulties.'
     ],
-    learning: 'AI needs direction: the prompt is part of the design. Testing showed a trade-off I couldn\'t see on paper, which is that simplifying too far loses nuance.',
+    html: '<figure class="arch" role="img" aria-label="How Easy-to-Read works. 1: the reader pastes a URL in the browser. 2: a Node.js and Express server receives it. 3: Puppeteer opens the page and extracts the readable text. 4: the text and a prompt built from the Easy-to-Read guidelines go to LLaMA 3.2 through the Ollama API. 5: the browser shows a toggle between the original and the simplified version. Steps 2 to 4 run on the reader\'s own machine, so no content is sent to the cloud."><div class="arch-row" aria-hidden="true"><div class="arch-n"><span class="mono">01 · Browser</span><b>Reader pastes a URL</b></div><div class="arch-local"><span class="mono arch-cap">On the reader\'s machine · nothing sent to the cloud</span><div class="arch-in"><div class="arch-n"><span class="mono">02 · Node.js + Express</span><b>Server receives the request</b></div><div class="arch-n"><span class="mono">03 · Puppeteer</span><b>Opens the page, extracts the text</b></div><div class="arch-n acc"><span class="mono">04 · Ollama API</span><b>LLaMA 3.2 + my E2R prompt</b></div></div></div><div class="arch-n"><span class="mono">05 · Front end</span><b>Toggle: original ↔ easy to read</b></div></div><figcaption class="mono">How it works · the whole chain, coded by me</figcaption></figure>',
+    learning: 'Building the whole chain myself, from the page request to the model\'s answer, showed me where AI products really break: messy input, the prompt, speed and privacy. That is the language engineers speak, so I can design within those limits from the first sketch instead of finding them at handoff. And testing showed a trade-off I couldn\'t see on paper: simplify too far and nuance is lost.',
     result: [
       '<b>69% preferred the simplified version.</b> Reading time dropped noticeably and comprehension held.',
       'Validated that a local, private LLM can make real web content easier to understand.',
@@ -1210,6 +1224,7 @@ var CASES = {
     if (c.img && c.img.length) h += '<div class="case-imgs n' + Math.min(c.img.length, 2) + '">' + c.img.map(function (i) { return '<img src="' + i[0] + '" alt="' + i[1].replace(/"/g, '&quot;') + '" loading="lazy">'; }).join('') + '</div>';
     h += '<section><p class="case-k mono">T — Task</p><p>' + c.task + '</p></section>';
     h += '<section><p class="case-k mono">A — Action</p><ul>' + c.action.map(function (a) { return '<li>' + a + '</li>'; }).join('') + '</ul></section>';
+    if (c.html) h += c.html;
     if (c.figs) h += c.figs.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     if (c.pair) h += '<figure class="case-pair' + (c.pairNatural ? ' natural' : '') + '">' + c.pair.map(function (q) { return '<div><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
     if (c.films) h += '<figure class="case-films">' + c.films.map(function (q) { return '<div><iframe src="' + q[0] + '" title="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy" allow="autoplay"></iframe><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
