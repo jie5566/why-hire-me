@@ -120,6 +120,33 @@ img { max-width: 100%; display: block; }
 .card .tag { color: var(--soft); }
 .card .more { margin-top: 4px; font-size: 14px; font-weight: 500; color: var(--acc); }
 .card.note { padding: 26px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); transition: background-color .6s, border-color .6s; }
+.agent .ag-h { font-family: var(--display); font-size: clamp(30px, 4.2vw, 52px); line-height: 1.05; letter-spacing: -0.03em; margin: 14px 0 12px; }
+.agent > p { max-width: 62ch; }
+.ag { margin-top: 30px; display: grid; grid-template-columns: minmax(130px, 1.1fr) minmax(40px, .9fr) auto minmax(30px, .6fr) minmax(150px, 1.1fr); align-items: center; }
+.ag-in { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ag-in li { font-size: 14px; padding: 9px 14px; border: 1px solid currentColor; border-radius: 999px; opacity: .45; animation: agPill 4s var(--ease) infinite; white-space: nowrap; }
+.ag-in li:nth-child(2) { animation-delay: .5s; } .ag-in li:nth-child(3) { animation-delay: 1s; } .ag-in li:nth-child(4) { animation-delay: 1.5s; }
+.ag-lines { width: 100%; height: 100%; min-height: 180px; overflow: visible; }
+.ag-outl { min-height: 20px; }
+.ag-lines path { fill: none; stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; stroke-dasharray: 4 6; opacity: .6; animation: agFlow 1.6s linear infinite; }
+.ag-core { position: relative; width: 112px; height: 112px; border-radius: 50%; border: 1.5px solid currentColor; display: flex; align-items: center; justify-content: center; }
+.ag-core span { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
+.ag-core::before, .ag-core::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid currentColor; animation: agRing 3s ease-out infinite; }
+.ag-core::after { animation-delay: 1.5s; }
+.ag-out { display: flex; flex-direction: column; gap: 6px; padding-left: 6px; }
+.ag-out b { font-size: 18px; font-weight: 600; line-height: 1.25; }
+.ag-out span { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; opacity: .8; }
+@keyframes agPill { 0%, 100% { opacity: .45; } 15%, 35% { opacity: 1; } }
+@keyframes agFlow { to { stroke-dashoffset: -20; } }
+@keyframes agRing { 0% { transform: scale(1); opacity: .6; } 100% { transform: scale(1.6); opacity: 0; } }
+@media (max-width: 760px) {
+  .ag { grid-template-columns: 1fr; justify-items: start; gap: 14px; }
+  .ag-in { grid-template-columns: 1fr 1fr; width: 100%; }
+  .ag-lines { display: none; }
+  .ag-core { width: 92px; height: 92px; margin: 6px 0; }
+  .ag-out { padding-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .ag-in li, .ag-lines path, .ag-core::before, .ag-core::after { animation: none; } .ag-in li { opacity: 1; } }
 .tools .tl { list-style: none; margin: 22px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
 .tools .tl li { background: var(--card); padding: 16px; display: flex; flex-direction: column; gap: 6px; transition: background-color .6s; }
 .tools .tl-k { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--acc); }
@@ -563,8 +590,8 @@ html.case-open { overflow: hidden; }
   <section class="ch" id="ai" data-stage="4" aria-labelledby="ai-h">
     <div class="ch-in">
       <p class="ch-num mono rv">04 / Generate — AI</p>
-      <h2 class="disp rv" id="ai-h">AI that gets it exactly right.</h2>
-      <p class="ch-body rv">In commercial work, AI is only useful if the product looks exactly like the product. I know what each AI tool does best, and connect them with traditional tools into workflows that a team of critical designers will sign off.</p>
+      <h2 class="disp rv" id="ai-h">AI does the repeat work. I do the judgment.</h2>
+      <p class="ch-body rv">I spot what repeats, build it into agents and workflows, and choose the right model for each step. The output is often an image; the skill is the system behind it, and the eye that decides what is good enough to publish.</p>
       <div class="cards">
         <a class="card wide rv" href="#transparent-ai">
           <div class="media"><img src="assets/tr-stand.jpg" alt="Transparent turntable on its stand behind ribbed glass, a figure walking past" loading="lazy"></div>
@@ -573,29 +600,19 @@ html.case-open { overflow: hidden; }
           <p>Product-accurate AI images, now live on Transparent's Instagram and website, made without a photoshoot or set building.</p>
           <span class="more">Case study →</span>
         </a>
-        <div class="card wide note tools rv">
-          <span class="tag mono">Right tool, right job</span>
-          <h3>I know what each AI tool is best at, and when to use it</h3>
-          <p>No single model does everything well. Choosing the right one for each step is what makes the result fast <i>and</i> exact.</p>
-          <ul class="tl"><li><span class="mono tl-k">Mood</span><b>Midjourney</b><span class="tl-d">First looks, new scenes and art direction, when the feeling matters most.</span></li><li><span class="mono tl-k">Consistency</span><b>Nano Banana</b><span class="tl-d">Keeping the same product or model true across angles and edits.</span></li><li><span class="mono tl-k">Precise edits</span><b>ChatGPT image</b><span class="tl-d">Targeted changes that follow exact instructions, like a new background.</span></li><li><span class="mono tl-k">Motion</span><b>Seedance</b><span class="tl-d">Turning approved stills into short video, together with Midjourney.</span></li><li><span class="mono tl-k">Film</span><b>Veo · Runway</b><span class="tl-d">Longer shots and branded video, directed shot by shot.</span></li><li><span class="mono tl-k">Sound</span><b>ElevenLabs · Suno</b><span class="tl-d">Voice and music, so a film is finished, not just generated.</span></li><li><span class="mono tl-k">All in one</span><b>ArtCraft · Artlist</b><span class="tl-d">Several models in one place, when a project needs many of them at once.</span></li><li><span class="mono tl-k">Precision</span><b>Adobe</b><span class="tl-d">Selections, retouching and the final pixel, wherever AI drifts.</span></li></ul>
+
+        <div class="card wide note feature agent rv">
+          <span class="tag mono">My own AI agents</span>
+          <h3 class="ag-h">I build my own AI agents.</h3>
+          <p>When I notice I'm explaining the same context or repeating the same steps, I build it into an agent. Every new task then starts from the brief, and my time goes to judgment and taste.</p>
+          <div class="ag" aria-hidden="true">
+            <ul class="ag-in"><li>Brand context</li><li>Product facts</li><li>Tone of voice</li><li>Repeated steps</li></ul>
+            <svg class="ag-lines" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 12.5 C 55 12.5, 45 50, 100 50"/><path d="M0 37.5 C 55 37.5, 45 50, 100 50"/><path d="M0 62.5 C 55 62.5, 45 50, 100 50"/><path d="M0 87.5 C 55 87.5, 45 50, 100 50"/></svg>
+            <div class="ag-core"><span class="mono">Agent</span></div>
+            <svg class="ag-lines ag-outl" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 50 L100 50"/></svg>
+            <div class="ag-out"><b>Every brief starts here</b><span class="mono">My time → judgment</span></div>
+          </div>
         </div>
-        <div class="card note feature rv">
-          <span class="tag mono">Built it myself</span>
-          <h3>An agent that remembers the brief</h3>
-          <p>I noticed which context and steps I repeated for every image, and put them into an agent. Now each image starts from the brief, and my time goes to judgment.</p>
-        </div>
-        <div class="card note rv">
-          <span class="tag mono">Localisation workflow</span>
-          <h3>2 weeks → 1 day</h3>
-          <p>A 21-page InDesign document translated into dozens of languages directly through AI, with the layout intact.</p>
-        </div>
-        <a class="card wide rv" href="https://visual.jiechen.design/">
-          <div class="media"><img src="assets/v-jvision.jpg" alt="Still from the JVISION AI branding film" loading="lazy"></div>
-          <span class="tag mono">Creative AI · visual.jiechen.design</span>
-          <h3>Films, fashion shoots and prompt systems</h3>
-          <p>Midjourney, Nano Banana, Veo, Runway, ElevenLabs and Suno, directed toward one visual idea at a time.</p>
-          <span class="more">See the collection ↗</span>
-        </a>
       </div>
     </div>
   </section>
@@ -603,21 +620,18 @@ html.case-open { overflow: hidden; }
   <!-- 05 · Render -->
   <section class="ch" id="visual" data-stage="5" aria-labelledby="visual-h">
     <div class="ch-in">
-      <p class="ch-num mono rv">05 / Render — visual &amp; 3D</p>
-      <h2 class="disp rv" id="visual-h">Then make it real.</h2>
-      <p class="ch-body rv">Material, light and motion: the stage where a product starts to sell itself. Adobe and Blender when control matters, AI when speed does.</p>
+      <p class="ch-num mono rv">05 / Render — visual &amp; brand</p>
+      <h2 class="disp rv" id="visual-h">Then make it look right.</h2>
+      <p class="ch-body rv">My visual side, in three kinds of work: brand identities, campaigns, and films and imagery made with AI. Each one starts from a single visual idea and follows it everywhere.</p>
       <div class="gallery">
-        <figure class="rv"><div class="media"><img src="assets/tr-cartridge.jpg" alt="Close-up of a Transparent tonearm with a blue Ortofon 2M cartridge and its coloured signal wires" loading="lazy"></div><figcaption class="mono">Transparent · turntable detail</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/tr-brutalist-fog.jpg" alt="Brutalist speaker in warm orange fog" loading="lazy"></div><figcaption class="mono">Transparent · Brutalist</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/tr-acoustic-after.jpg" alt="Close-up of the drivers on a white Acoustic Sculpture speaker" loading="lazy"></div><figcaption class="mono">Transparent · Acoustic Sculpture</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/v-sumi.jpg" alt="SUMI furniture brand: packaging with a brush-circle logo" loading="lazy"></div><figcaption class="mono">SUMI · furniture branding</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/tr-brutalist-beam.jpg" alt="Brutalist speaker from above in a beam of light" loading="lazy"></div><figcaption class="mono">Transparent · light study</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/v-kemizaras.jpg" alt="Kemizaras: an elderly man at a table beside a small white monitoring robot" loading="lazy"></div><figcaption class="mono">Kemizaras · AI branding film</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/v-nortint.jpg" alt="Nortint Dry Gin bottle identity" loading="lazy"></div><figcaption class="mono">Nortint · gin identity</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/v-deep-blue.jpg" alt="Deep in Blue exhibition campaign visual" loading="lazy"></div><figcaption class="mono">Deep in Blue · exhibition</figcaption></figure>
-        <figure class="rv"><div class="media"><img src="assets/v-fashion.jpg" alt="AI fashion product shoot: model in a jacket, front view" loading="lazy"></div><figcaption class="mono">AI fashion product shoot</figcaption></figure>
+        <figure class="rv"><div class="media"><img src="assets/v-sumi.jpg" alt="SUMI furniture brand: packaging with a brush-circle logo" loading="lazy"></div><figcaption class="mono">Brand identity · SUMI</figcaption></figure>
+        <figure class="rv"><div class="media"><img src="assets/v-nortint.jpg" alt="Nortint Dry Gin bottle identity" loading="lazy"></div><figcaption class="mono">Brand identity · Nortint gin</figcaption></figure>
+        <figure class="rv"><div class="media"><img src="assets/v-deep-blue.jpg" alt="Deep in Blue exhibition campaign visual" loading="lazy"></div><figcaption class="mono">Campaign · Deep in Blue</figcaption></figure>
+        <figure class="rv"><div class="media"><img src="assets/v-jvision.jpg" alt="Still from the JVISION AI branding film" loading="lazy"></div><figcaption class="mono">AI film · JVISION</figcaption></figure>
+        <figure class="rv"><div class="media"><img src="assets/v-kemizaras.jpg" alt="Kemizaras: an elderly man at a table beside a small white monitoring robot" loading="lazy"></div><figcaption class="mono">AI film · Kemizaras</figcaption></figure>
+        <figure class="rv"><div class="media"><img src="assets/v-fashion.jpg" alt="AI fashion product shoot: model in a jacket, front view" loading="lazy"></div><figcaption class="mono">AI imagery · fashion shoot</figcaption></figure>
       </div>
-      <a class="more-link rv" href="https://visual.jiechen.design/">All visual work on visual.jiechen.design ↗</a>
+      <a class="more-link rv" href="https://visual.jiechen.design/">See all visual work on visual.jiechen.design ↗</a>
     </div>
   </section>
 
@@ -1247,7 +1261,7 @@ var CASES = {
       '<b>Translated InDesign layouts through AI:</b> a 21-page document into dozens of languages, layout intact, with no copy-paste.'
     ],
     html: '<figure class="arch wf" role="img" aria-label="My AI content workflow at Transparent in six steps: 1, I spot the context and steps I keep repeating. 2, an AI agent holds the brand context, product facts, tone and repeated steps. 3, real product photos are the base. 4, AI generates new angles and scenes. 5, I judge every image, reject any flaw and retouch in Adobe. 6, the design team reviews and it is published. Steps 1 and 5 are my judgment."><div class="wf-grid" aria-hidden="true"><div class="arch-n acc"><span class="mono">01 · Me</span><b>Spot the repeats</b><em>Which context did I explain every time? Which steps did I repeat?</em></div><div class="arch-n"><span class="mono">02 · Agent</span><b>Set up once</b><em>Brand context, product facts, tone and the repeated steps</em></div><div class="arch-n"><span class="mono">03 · Base</span><b>The real product</b><em>Real product photos in, so the product stays true</em></div><div class="arch-n"><span class="mono">04 · AI</span><b>Generate &amp; edit</b><em>New angles and scenes in Midjourney, ChatGPT image, Nano Banana</em></div><div class="arch-n acc"><span class="mono">05 · Me</span><b>Judge every image</b><em>Select for light, material and calm; reject any flaw; retouch in Adobe</em></div><div class="arch-n"><span class="mono">06 · Team</span><b>Designer review</b><em>Approved, then published on Instagram and the website</em></div></div><figcaption class="mono">The workflow · highlighted steps are where my judgment goes</figcaption></figure>',
-    toolsSel: '.tools',
+    tools: true,
     learning: 'AI makes images cheap; taste and judgment decide which ones are worth publishing. The leverage comes from noticing what repeats and putting it into a system, so my attention goes to the aesthetic decisions. With a team of designers reviewing, "almost right" doesn\'t pass.',
     result: [
       '<b>First usable, on-brand product image in 2 days</b>, against an estimated 2–3 weeks and tens of thousands of SEK for a shoot.',
@@ -1258,6 +1272,7 @@ var CASES = {
   }
 };
 
+var TOOLS_UL = '<ul class="tl"><li><span class="mono tl-k">Mood</span><b>Midjourney</b><span class="tl-d">First looks, new scenes and art direction, when the feeling matters most.</span></li><li><span class="mono tl-k">Consistency</span><b>Nano Banana</b><span class="tl-d">Keeping the same product or model true across angles and edits.</span></li><li><span class="mono tl-k">Precise edits</span><b>ChatGPT image</b><span class="tl-d">Targeted changes that follow exact instructions, like a new background.</span></li><li><span class="mono tl-k">Motion</span><b>Seedance</b><span class="tl-d">Turning approved stills into short video, together with Midjourney.</span></li><li><span class="mono tl-k">Film</span><b>Veo · Runway</b><span class="tl-d">Longer shots and branded video, directed shot by shot.</span></li><li><span class="mono tl-k">Sound</span><b>ElevenLabs · Suno</b><span class="tl-d">Voice and music, so a film is finished, not just generated.</span></li><li><span class="mono tl-k">All in one</span><b>ArtCraft · Artlist</b><span class="tl-d">Several models in one place, when a project needs many of them at once.</span></li><li><span class="mono tl-k">Precision</span><b>Adobe</b><span class="tl-d">Selections, retouching and the final pixel, wherever AI drifts.</span></li></ul>';
 (function () {
   var box = document.getElementById('case'), body = document.getElementById('case-body'), kicker = document.getElementById('case-kicker');
   var closeBtn = document.getElementById('case-close'), lastFocus = null, open = null;
@@ -1271,7 +1286,7 @@ var CASES = {
     h += '<section><p class="case-k mono">T — Task</p><p>' + c.task + '</p></section>';
     h += '<section><p class="case-k mono">A — Action</p><ul>' + c.action.map(function (a) { return '<li>' + a + '</li>'; }).join('') + '</ul></section>';
     if (c.html) h += c.html;
-    if (c.toolsSel) { var tm = document.querySelector(c.toolsSel); if (tm) h += '<figure class="case-tools">' + tm.querySelector('.tl').outerHTML + '<figcaption class="mono">Right tool, right job · what each tool is best at</figcaption></figure>'; }
+    if (c.tools) h += '<figure class="case-tools">' + TOOLS_UL + '<figcaption class="mono">Right tool, right job · what each tool is best at</figcaption></figure>';
     if (c.deck) h += '<figure class="case-deck"><div class="deck-box"><iframe src="' + c.deck[0] + '" title="' + c.deck[1].replace(/"/g, '&quot;') + '" loading="lazy"></iframe></div><figcaption class="mono"><span>' + c.deck[2] + '</span><a href="' + c.deck[0] + '" target="_blank" rel="noopener">Open full screen ↗</a></figcaption></figure>';
     if (c.figs) h += c.figs.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     if (c.pair) h += '<figure class="case-pair' + (c.pairNatural ? ' natural' : '') + '">' + c.pair.map(function (q) { return '<div><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
