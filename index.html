@@ -345,6 +345,9 @@ html.case-open { overflow: hidden; }
 .arch-n.acc span { color: var(--acc); }
 .arch figcaption { margin-top: 10px; color: var(--soft); }
 @media (max-width: 760px) { .arch-row, .arch-in { grid-template-columns: 1fr; } .arch-local { padding-top: 10px; } .arch-cap { position: static; display: block; margin: 0 2px 10px; line-height: 1.4; } }
+.wf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.wf .arch-n em { font-style: normal; font-size: 13px; line-height: 1.45; color: var(--soft); }
+@media (max-width: 640px) { .wf-grid { grid-template-columns: 1fr; } }
 .hk { margin: 0; }
 .hk-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: stretch; }
 .hk-p { border: 1px dashed var(--soft); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
@@ -565,7 +568,7 @@ html.case-open { overflow: hidden; }
         <div class="card note feature rv">
           <span class="tag mono">Built it myself</span>
           <h3>An agent that remembers the brief</h3>
-          <p>It holds brand context, product facts and tone between tasks, so no image starts with a re-explanation.</p>
+          <p>I noticed which context and steps I repeated for every image, and put them into an agent. Now each image starts from the brief, and my time goes to judgment.</p>
         </div>
         <div class="card note rv">
           <span class="tag mono">Localisation workflow</span>
@@ -1213,7 +1216,7 @@ var CASES = {
   'transparent-ai': {
     kicker: 'Transparent · Aug 2026 – now',
     title: 'AI content workflows that replaced weeks of production',
-    lead: 'Product-accurate AI imagery and AI-driven localisation for a design-led audio brand, approved by a team of designers.',
+    lead: 'Product-accurate AI imagery and AI-driven localisation for a design-led audio brand. The tools are fast; what makes it work is the workflow I built and the judgment I bring to every image.',
     meta: [['Role', 'Marketing, content & digital design'], ['Tools', 'Midjourney, ChatGPT image, Nano Banana, Seedance, ArtCraft, Artlist, Adobe'], ['Live on', 'Instagram and transpa.rent']],
     img: [
       ['assets/tr-stand.jpg', 'Transparent turntable stand behind ribbed glass, a figure walking past'],
@@ -1223,11 +1226,14 @@ var CASES = {
     ],
     task: 'Transparent needs a steady flow of product images, for example a product shown with one cable instead of two, or in a new scene. Traditionally that means a shoot with set building: at least 2–3 weeks and tens of thousands of SEK. Every image must show the real product exactly and match the brand\'s tone, and the whole team are designers.',
     action: [
-      '<b>Set up my own AI agent</b> holding brand context, product facts and tone, so no image started with a re-explanation.',
-      '<b>Combined AI and traditional tools for precision:</b> real product photos as the base, AI for generation and edits, then strict selections and retouching in Adobe where AI drifts.',
+      '<b>Noticed what I kept repeating.</b> For the first images I explained the same brand context, product facts and tone every time, and ran the same steps in the same order. That was the signal to build a system.',
+      '<b>Built my own AI agent around it.</b> The repeated context and the repeated steps live in the agent, so each new image starts from the brief instead of a re-explanation, and my time goes to the decisions only I can make.',
+      '<b>Kept the real product as the base.</b> Real product photos in, AI for new angles, scenes and edits, then strict selections and retouching in Adobe wherever AI drifts on detail.',
+      '<b>Judged every image with a designer\'s eye.</b> AI gives many options and most are almost right. I choose what fits the brand\'s light, materials and calm, reject anything with a flaw however small, and fix the rest by hand. Only flawless images leave my desk.',
       '<b>Translated InDesign layouts through AI:</b> a 21-page document into dozens of languages, layout intact, with no copy-paste.'
     ],
-    learning: 'AI image tools alone aren\'t precise enough for product work. The value is in the workflow: real references, a context-aware agent and traditional retouching. With designers reviewing, "almost right" doesn\'t pass.',
+    html: '<figure class="arch wf" role="img" aria-label="My AI content workflow at Transparent in six steps: 1, I spot the context and steps I keep repeating. 2, an AI agent holds the brand context, product facts, tone and repeated steps. 3, real product photos are the base. 4, AI generates new angles and scenes. 5, I judge every image, reject any flaw and retouch in Adobe. 6, the design team reviews and it is published. Steps 1 and 5 are my judgment."><div class="wf-grid" aria-hidden="true"><div class="arch-n acc"><span class="mono">01 · Me</span><b>Spot the repeats</b><em>Which context did I explain every time? Which steps did I repeat?</em></div><div class="arch-n"><span class="mono">02 · Agent</span><b>Set up once</b><em>Brand context, product facts, tone and the repeated steps</em></div><div class="arch-n"><span class="mono">03 · Base</span><b>The real product</b><em>Real product photos in, so the product stays true</em></div><div class="arch-n"><span class="mono">04 · AI</span><b>Generate &amp; edit</b><em>New angles and scenes in Midjourney, ChatGPT image, Nano Banana</em></div><div class="arch-n acc"><span class="mono">05 · Me</span><b>Judge every image</b><em>Select for light, material and calm; reject any flaw; retouch in Adobe</em></div><div class="arch-n"><span class="mono">06 · Team</span><b>Designer review</b><em>Approved, then published on Instagram and the website</em></div></div><figcaption class="mono">The workflow · highlighted steps are where my judgment goes</figcaption></figure>',
+    learning: 'AI makes images cheap; taste and judgment decide which ones are worth publishing. The leverage comes from noticing what repeats and putting it into a system, so my attention goes to the aesthetic decisions. With a team of designers reviewing, "almost right" doesn\'t pass.',
     result: [
       '<b>First usable, on-brand product image in 2 days</b>, against an estimated 2–3 weeks and tens of thousands of SEK for a shoot.',
       '<b>Approved by a team of designers</b> and <b>published on Instagram and the website</b>.',
