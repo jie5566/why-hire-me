@@ -343,6 +343,18 @@ html.case-open { overflow: hidden; }
 .case-links { display: flex; gap: 20px; flex-wrap: wrap; margin: 0; }
 .case-links a, .case-end a { color: var(--acc); font-weight: 500; text-decoration: none; }
 .case-links a:hover, .case-end a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.live-cta { position: relative; display: inline-flex; width: fit-content; justify-self: start; align-self: flex-start; align-items: center; gap: 12px; margin: 26px 0 0; padding: 13px 20px 13px 16px; border-radius: 999px; background: var(--acc); color: var(--on-acc); font-weight: 600; font-size: 15px; text-decoration: none; overflow: hidden; isolation: isolate; animation: liveRing 2.6s var(--ease) infinite; transition: transform .25s var(--ease); }
+.live-cta:hover { transform: translateY(-2px); }
+.live-cta::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.38) 50%, transparent 65%); transform: translateX(-120%); animation: liveSheen 3.2s ease-in-out infinite; }
+.live-cta .ld { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #3DDC84; flex: none; }
+.live-cta .ld::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #3DDC84; animation: livePing 1.6s ease-out infinite; }
+.live-cta .lk { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.live-cta .la { display: inline-block; transition: transform .25s var(--ease); }
+.live-cta:hover .la { transform: translate(3px, -3px); }
+@keyframes livePing { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(3); opacity: 0; } }
+@keyframes liveSheen { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@keyframes liveRing { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc) 45%, transparent); } 70%, 100% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--acc) 0%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .live-cta, .live-cta::before, .live-cta .ld::after { animation: none; } }
 .case-end { margin: 0; padding-top: 24px; border-top: 1px solid var(--line); }
 @media (max-width: 899px) {
   .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1192,6 +1204,7 @@ var CASES = {
   function render(c) {
     var h = '<h2 class="disp" id="case-title">' + c.title + '</h2><p class="case-lead">' + c.lead + '</p>';
     h += '<dl class="case-meta">' + c.meta.map(function (m) { return '<div><dt class="mono">' + m[0] + '</dt><dd>' + m[1] + '</dd></div>'; }).join('') + '</dl>';
+    if (c.links) h += c.links.map(function (l) { return '<a class="live-cta" href="' + l[1] + '" target="_blank" rel="noopener"><span class="ld" aria-hidden="true"></span><span class="lk">Live</span><span>' + l[0] + '</span><span class="la" aria-hidden="true">↗</span></a>'; }).join(' ');
     if (c.chart || c.chartSel) { var v = document.querySelector(c.chartSel || '.media.viz'); if (v) h += '<figure class="case-chart">' + v.outerHTML + (c.chartNote ? '<figcaption class="mono">' + c.chartNote + '</figcaption>' : '') + '</figure>'; }
     if (c.img && c.img.length) h += '<div class="case-imgs n' + Math.min(c.img.length, 2) + '">' + c.img.map(function (i) { return '<img src="' + i[0] + '" alt="' + i[1].replace(/"/g, '&quot;') + '" loading="lazy">'; }).join('') + '</div>';
     h += '<section><p class="case-k mono">T — Task</p><p>' + c.task + '</p></section>';
@@ -1202,7 +1215,7 @@ var CASES = {
     if (c.figsEnd) h += c.figsEnd.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     h += '<section><p class="case-k mono">L — Learning</p><p>' + c.learning + '</p></section>';
     h += '<section class="case-r"><p class="case-k mono">R — Result</p><ul>' + c.result.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></section>';
-    if (c.links) h += '<p class="case-links">' + c.links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + ' ↗</a>'; }).join('') + '</p>';
+    if (c.links) h += '<p class="case-links">' + c.links.map(function (l) { return '<a class="live-cta" href="' + l[1] + '" target="_blank" rel="noopener"><span class="ld" aria-hidden="true"></span><span class="lk">Live</span><span>' + l[0] + '</span><span class="la" aria-hidden="true">↗</span></a>'; }).join('') + '</p>';
     h += '<p class="case-end"><a href="#contact" data-close>Talk to me about this →</a></p>';
     return h;
   }
@@ -1216,12 +1229,17 @@ var CASES = {
   function hide(toHash) {
     if (!open) return;
     open = null; box.classList.remove('on'); document.documentElement.classList.remove('case-open');
-    setTimeout(function () { if (!open) box.hidden = true; }, 300);
+    body.querySelectorAll('iframe').forEach(function (f) { try { f.contentWindow.postMessage({ pg: 'pause' }, '*'); } catch (e) {} });
+    setTimeout(function () { if (!open) { box.hidden = true; body.innerHTML = ''; } }, 300);
     if (toHash !== undefined) { try { history.replaceState(null, '', toHash || location.pathname + location.search); } catch (e) {} }
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   function route() { var id = location.hash.slice(1); if (CASES[id]) show(id); else if (open) hide(); }
   window.addEventListener('hashchange', route);
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.pg !== 'playing') return;
+    body.querySelectorAll('iframe').forEach(function (f) { if (f.contentWindow !== e.source) { try { f.contentWindow.postMessage({ pg: 'pause' }, '*'); } catch (x) {} } });
+  });
   closeBtn.addEventListener('click', function () { hide(''); });
   box.addEventListener('click', function (e) {
     if (e.target === box) { hide(''); return; }
