@@ -498,14 +498,14 @@ html.case-open { overflow: hidden; }
       <p class="ch-body rv">JavaScript, HTML, CSS, Node and Express, learned properly, not just generated. I know how a front end talks to a server and how an AI model sits behind an API, so I design within real technical limits and speak the same language as engineers. AI coding tools make me faster; they don't replace knowing what the code does.</p>
       <div class="cards">
         <a class="card wide rv" href="#easy-to-read">
-<div class="media e2r" role="img" aria-label="Illustration: a dense web article on the left is simplified by a local LLaMA 3.2 model into an Easy-to-Read version on the right, with a heading, short lines and clear steps. A toggle switches between original and simplified. 69% of 54 test users preferred the simplified version.">
+<div class="media e2r" role="img" aria-label="Illustration: a dense web article on the left is simplified by a local LLaMA 3.2 model into an Easy-to-Read version on the right, with a heading, short lines and clear steps. A toggle switches between original and simplified. In a questionnaire A/B test, 69% of 54 valid answers preferred the simplified version.">
             <div class="e2-top" aria-hidden="true"><span class="mono">any URL → easy to read</span><span class="e2-tog mono"><b>Original</b><b class="on">Easy to Read</b></span></div>
             <div class="e2-stage" aria-hidden="true">
               <div class="e2-doc dense"><span class="mono e2-tag">Original</span><div class="e2-lines"><i style="width:100%"></i><i style="width:96%"></i><i style="width:100%"></i><i style="width:93%"></i><i style="width:99%"></i><i style="width:100%"></i><i style="width:88%"></i><i style="width:97%"></i><i style="width:100%"></i><i style="width:95%"></i><i style="width:100%"></i><i style="width:62%"></i></div></div>
               <div class="e2-mid"><span class="e2-arrow"></span><span class="mono">LLaMA 3.2<br>on device</span></div>
               <div class="e2-doc simple"><span class="mono e2-tag acc">Easy to Read</span><div class="e2-h"></div><div class="e2-lines"><i style="width:78%"></i><i style="width:64%"></i></div><ul><li><i style="width:58%"></i></li><li><i style="width:66%"></i></li><li><i style="width:50%"></i></li></ul></div>
             </div>
-            <div class="vz-foot"><span class="cv-big disp">69%</span><span class="cv-sub mono">of 54 test users preferred the simplified version</span></div>
+            <div class="vz-foot"><span class="cv-big disp">69%</span><span class="cv-sub mono">of 54 valid questionnaire answers preferred the simplified version</span></div>
           </div>
           <span class="tag mono">Accessibility · local LLM · coded end to end</span>
           <h3>Easy-to-Read: any web page, rewritten for people who struggle to read</h3>
@@ -1147,7 +1147,7 @@ var CASES = {
   'easy-to-read': {
     kicker: 'Degree project · accessibility',
     title: 'Easy-to-Read: any web page, rewritten for people who struggle to read',
-    lead: 'A working tool I designed and coded myself. It simplifies any web page with a private, local LLM, and was tested with 63 people.',
+    lead: 'A working tool I designed and coded myself. It simplifies any web page with a private, local LLM, and I tested it one to one with 9 people with reading difficulties.',
     chartSel: '.media.e2r', chartNote: 'Illustration of how the tool works, drawn for this portfolio.',
     meta: [['Role', 'UX research, UX/UI, front-end and server code'], ['Team', 'Solo, with academic supervision'], ['Time', '16 weeks'], ['Stack', 'Figma, Node.js, Express, Puppeteer, LLaMA 3.2 via Ollama']],
     task: 'Accessibility tools help people reach content, not understand it. Could AI simplify any web page for people with reading difficulties without losing its meaning or their privacy?',
@@ -1156,12 +1156,13 @@ var CASES = {
       'Designed a minimal flow: paste a URL, toggle between original and simplified. A toggle, not a split view, to cut overload and bias in testing.',
       '<b>Wrote the code myself.</b> A Node.js and Express server; Puppeteer to open the page and pull out the readable text; LLaMA 3.2 running locally through Ollama\'s API, so nothing a reader opens leaves their machine.',
       '<b>Treated the prompt as part of the product.</b> Turned the Easy-to-Read guidelines into a structured prompt: short sentences, simple words, clear structure, and no meaning lost.',
-      'Ran an A/B test with 54 people and a usability test with 9 people with reading difficulties.'
+      '<b>Validated in two steps.</b> First a questionnaire with a small A/B test (54 valid answers; the rest did not qualify). Then one-to-one tests with 9 people with reading difficulties, such as dyslexia and ADHD, using the real tool.'
     ],
     html: '<figure class="arch" role="img" aria-label="How Easy-to-Read works. 1: the reader pastes a URL in the browser. 2: a Node.js and Express server receives it. 3: Puppeteer opens the page and extracts the readable text. 4: the text and a prompt built from the Easy-to-Read guidelines go to LLaMA 3.2 through the Ollama API. 5: the browser shows a toggle between the original and the simplified version. Steps 2 to 4 run on the reader\'s own machine, so no content is sent to the cloud."><div class="arch-row" aria-hidden="true"><div class="arch-n"><span class="mono">01 · Browser</span><b>Reader pastes a URL</b></div><div class="arch-local"><span class="mono arch-cap">On the reader\'s machine · nothing sent to the cloud</span><div class="arch-in"><div class="arch-n"><span class="mono">02 · Node.js + Express</span><b>Server receives the request</b></div><div class="arch-n"><span class="mono">03 · Puppeteer</span><b>Opens the page, extracts the text</b></div><div class="arch-n acc"><span class="mono">04 · Ollama API</span><b>LLaMA 3.2 + my E2R prompt</b></div></div></div><div class="arch-n"><span class="mono">05 · Front end</span><b>Toggle: original ↔ easy to read</b></div></div><figcaption class="mono">How it works · the whole chain, coded by me</figcaption></figure>',
     learning: 'Building the whole chain myself, from the page request to the model\'s answer, showed me where AI products really break: messy input, the prompt, speed and privacy. That is the language engineers speak, so I can design within those limits from the first sketch instead of finding them at handoff. And testing showed a trade-off I couldn\'t see on paper: simplify too far and nuance is lost.',
     result: [
-      '<b>69% preferred the simplified version.</b> Reading time dropped noticeably and comprehension held.',
+      '<b>In the questionnaire A/B test, 69% of the 54 valid answers preferred the simplified version.</b>',
+      'The one-to-one tests let me watch 9 people with reading difficulties use the real tool, beyond what a questionnaire can measure.',
       'Validated that a local, private LLM can make real web content easier to understand.',
       'Next: user-controlled simplification levels and better protection of nuance.'
     ]
