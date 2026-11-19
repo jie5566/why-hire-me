@@ -205,6 +205,8 @@ a.card:hover .media img { transform: scale(1.03); }
 .contact { position: absolute; left: var(--pad); right: var(--pad); bottom: 36px; display: flex; flex-direction: column; gap: 28px; }
 .email { font-family: var(--display); font-style: var(--d-style); font-weight: var(--d-weight); letter-spacing: var(--d-track); font-size: calc(clamp(30px, 4.4vw, 64px) * var(--d-scale)); line-height: 1; text-decoration: none; word-break: break-word; }
 .email:hover { color: var(--acc); }
+.phone { display: block; width: fit-content; margin-top: 16px; font-family: var(--display); font-weight: 500; letter-spacing: -0.01em; font-size: clamp(20px, 2.2vw, 30px); color: var(--soft); text-decoration: none; }
+.phone:hover { color: var(--acc); }
 .foot { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--line); color: var(--soft); }
 .foot a { text-decoration: none; }
 .foot a:hover { color: var(--ink); }
@@ -689,6 +691,7 @@ html.case-open { overflow: hidden; }
     <p class="answer-note">Same object, seen from another angle.</p>
     <div class="contact">
       <a class="email" href="mailto:contact@jiechen.design">contact@jiechen.design</a>
+      <a class="phone" href="tel:+46769309285" aria-label="Phone: +46 76 930 92 85">+46 76 930 92 85</a>
       <div class="foot mono">
         <span>© 2026 Jie Chen · Stockholm</span>
         <span class="foot-links"><a href="https://www.linkedin.com/in/jie-chen-1768a725/">LinkedIn ↗</a><a href="https://visual.jiechen.design/">Visual work ↗</a><a href="#top">Back to top ↑</a></span>
