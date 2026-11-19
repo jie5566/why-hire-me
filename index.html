@@ -273,6 +273,16 @@ a.card:hover .media.cover { border-color: var(--acc); }
 .e2-arrow { position: relative; width: 100%; height: 1px; background: var(--acc); }
 .e2-arrow::after { content: ""; position: absolute; right: -1px; top: -4px; border: 4.5px solid transparent; border-left: 7px solid var(--acc); border-right: 0; }
 @media (max-width: 899px) { .card.wide .media.e2r { aspect-ratio: auto; min-height: 330px; } .e2-stage { grid-template-columns: 1fr 44px 1fr; } .e2-mid span.mono { display: none; } }
+
+/* learning panel: sits beside the side project */
+.learn { display: flex; flex-direction: column; justify-content: flex-end; gap: 22px; padding: 28px; border: 1px solid var(--line); border-radius: 6px; align-self: stretch; }
+.learn .tag { color: var(--acc); }
+.learn ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.learn li { display: flex; flex-direction: column; gap: 4px; padding: 16px 0; border-top: 1px solid var(--line); font-size: 16px; }
+.learn li b { font-weight: 600; font-size: 20px; letter-spacing: -0.01em; }
+.learn li span { color: var(--soft); }
+.learn-st { color: var(--soft); }
+
 /* case reader */
 html.case-open { overflow: hidden; }
 .case { position: fixed; inset: 0; z-index: 40; overflow-y: auto; overscroll-behavior: contain; background: color-mix(in srgb, var(--bg) 55%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transition: opacity .3s ease; }
@@ -408,15 +418,13 @@ html.case-open { overflow: hidden; }
           <p>As a mother of two, I turned "where should we go this weekend?" into a live, bilingual web app in 4 days, with community moderation and a full launch kit.</p>
           <span class="more">Case study →</span>
         </a>
-        <div class="card note feature rv">
-          <span class="tag mono">Learning now</span>
-          <h3>AI product management</h3>
-          <p>Microsoft AI Product Manager Professional Certificate and Duke University's AI Product Management Specialization, both in progress, to plan products end to end.</p>
-        </div>
-        <div class="card note rv">
-          <span class="tag mono">How I start</span>
-          <h3>Problem before pixels</h3>
-          <p>Who it is for, what it must prove and how we will know, written down before anything is drawn.</p>
+        <div class="learn rv">
+          <span class="tag mono">Learning now · AI product management</span>
+          <ul>
+            <li><b>Microsoft</b><span>AI Product Manager Professional Certificate</span></li>
+            <li><b>Duke University</b><span>AI Product Management Specialization</span></li>
+          </ul>
+          <span class="mono learn-st">Both in progress</span>
         </div>
       </div>
     </div>
