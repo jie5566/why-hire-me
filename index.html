@@ -356,6 +356,13 @@ html.case-open { overflow: hidden; }
 .hk figcaption { margin-top: 10px; color: var(--soft); }
 @media (max-width: 900px) { .hk-row { grid-template-columns: 1fr; } }
 @media (min-width: 521px) and (max-width: 900px) { .hk-in { grid-template-columns: 1fr 1fr; } }
+.case-deck { margin: 0; }
+.deck-box { position: relative; width: 100%; aspect-ratio: 16 / 10; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+.deck-box iframe { position: absolute; top: 0; left: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; transform: scale(var(--ds, .58)); }
+.case-deck figcaption { margin-top: 10px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--soft); }
+.case-deck figcaption a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+.case-deck figcaption a:hover { border-color: var(--ink); }
+@media (max-width: 640px) { .deck-box { aspect-ratio: 9 / 16; } .deck-box iframe { width: 100%; height: 100%; transform: none; } }
 .case-films { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .case-films > div { min-width: 0; }
 .case-films iframe { display: block; width: 100%; aspect-ratio: 9 / 16; border: 0; border-radius: 8px; background: #10251b; }
@@ -1193,6 +1200,7 @@ var CASES = {
       '<b>Let Lovable carry the build.</b> Prompt-driven screens in a calm, Scandinavian visual style, constant small polish, then published straight to a live link.'
     ],
     html: '<figure class="hk" role="img" aria-label="The ten steps of my 3-hour process, in three phases. Frame: context, dataset, story. Design: personalise, language, AI, visuals. Build: Lovable, iteration, hand-in."><div class="hk-row" aria-hidden="true"><div class="hk-p"><span class="mono hk-cap">Frame</span><div class="hk-in" style="--n:3"><div class="hk-s"><span class="mono">01 · Context</span><b>What should it make people feel?</b></div><div class="hk-s"><span class="mono">02 · Dataset</span><b>Five datasets, five human themes</b></div><div class="hk-s"><span class="mono">03 · Story</span><b>A reflection, not a report</b></div></div></div><div class="hk-p"><span class="mono hk-cap">Design</span><div class="hk-in" style="--n:4"><div class="hk-s"><span class="mono">04 · Personalise</span><b>Country, gender, hours, tenure</b></div><div class="hk-s"><span class="mono">05 · Language</span><b>Gentle, never ranking</b></div><div class="hk-s"><span class="mono">06 · AI</span><b>Reflection, not judgment</b></div><div class="hk-s"><span class="mono">07 · Visuals</span><b>Calm Scandinavian minimalism</b></div></div></div><div class="hk-p"><span class="mono hk-cap">Build</span><div class="hk-in" style="--n:3"><div class="hk-s"><span class="mono">08 · Lovable</span><b>Prompt-driven screens</b></div><div class="hk-s"><span class="mono">09 · Iteration</span><b>Micro-UX polish</b></div><div class="hk-s"><span class="mono">10 · Hand-in</span><b>Published to a live link</b></div></div></div></div><figcaption class="mono">My 3-hour process · from the talk I gave to the Lovable community</figcaption></figure>',
+    deck: ['talks/lovable/index.html', 'Slides from my talk to the Lovable community: From Labor Data to a Personal Work Story', 'The talk I gave to the Lovable community · click through it'],
     learning: 'Under time pressure, judgment is the speed. Deciding what the product should make people feel, and what to leave out, took minutes and saved hours. AI tools turn ideas into visible screens fast, so the design decisions become the real work. And when AI talks about people\'s lives, tone is a product decision.',
     result: [
       '<b>1st place</b> at the Build for Impact: Labor Rights Data Hackathon.',
@@ -1243,6 +1251,7 @@ var CASES = {
     h += '<section><p class="case-k mono">T — Task</p><p>' + c.task + '</p></section>';
     h += '<section><p class="case-k mono">A — Action</p><ul>' + c.action.map(function (a) { return '<li>' + a + '</li>'; }).join('') + '</ul></section>';
     if (c.html) h += c.html;
+    if (c.deck) h += '<figure class="case-deck"><div class="deck-box"><iframe src="' + c.deck[0] + '" title="' + c.deck[1].replace(/"/g, '&quot;') + '" loading="lazy"></iframe></div><figcaption class="mono"><span>' + c.deck[2] + '</span><a href="' + c.deck[0] + '" target="_blank" rel="noopener">Open full screen ↗</a></figcaption></figure>';
     if (c.figs) h += c.figs.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     if (c.pair) h += '<figure class="case-pair' + (c.pairNatural ? ' natural' : '') + '">' + c.pair.map(function (q) { return '<div><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
     if (c.films) h += '<figure class="case-films">' + c.films.map(function (q) { return '<div><iframe src="' + q[0] + '" title="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy" allow="autoplay"></iframe><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
@@ -1259,6 +1268,10 @@ var CASES = {
     open = id; kicker.textContent = c.kicker; body.innerHTML = render(c);
     box.hidden = false; document.documentElement.classList.add('case-open');
     box.scrollTop = 0; requestAnimationFrame(function () { box.classList.add('on'); closeBtn.focus(); });
+    body.querySelectorAll('.deck-box').forEach(function (bx) {
+      var fit = function () { bx.style.setProperty('--ds', (bx.clientWidth / 1280).toFixed(4)); };
+      fit(); if (window.ResizeObserver) new ResizeObserver(fit).observe(bx);
+    });
     body.querySelectorAll('.case-pair').forEach(function (fig) {
       fig.querySelectorAll('img').forEach(function (im) {
         im.loading = 'eager';

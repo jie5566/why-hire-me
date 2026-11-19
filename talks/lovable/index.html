@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>From Labor Data to a Personal Work Story · talk to the Lovable community</title>
+
+    <link rel="stylesheet" href="tw.css" />
+
+    <style>
+      html,
+      body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background-color: #ffffff;
+        color: #1a1a1a;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      .slide {
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translateY(20px) scale(0.99);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 6rem 2rem 5rem 2rem;
+        z-index: 1;
+      }
+
+      @media (min-width: 768px) {
+        .slide {
+          padding: 6rem 6rem 5rem 6rem;
+        }
+      }
+
+      .slide.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+        z-index: 10;
+      }
+
+      .slide.prev {
+        transform: translateY(-20px) scale(0.99);
+      }
+
+      .slide-content {
+        width: 100%;
+        max-width: 1100px;
+        max-height: 80vh;
+        overflow-y: auto;
+        scrollbar-width: none;
+        padding: 1.5rem;
+      }
+
+      .slide-content::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Standard Interactive Cards */
+      .interactive-card {
+        transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        cursor: pointer;
+        border: 1px solid #f0f0f0;
+      }
+      .interactive-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        border-color: #2d42ff;
+      }
+
+      /* Slide 4 Mapping Cards */
+      .mapping-card {
+        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        border: 1px solid #f0f0f0;
+        cursor: pointer;
+        overflow: hidden;
+        max-height: 115px; /* Safely contains the title */
+        background: white;
+      }
+      .mapping-card.revealed {
+        max-height: 300px; /* Smoothly expands to fit contents */
+        background: #f8f9fa;
+        border-color: #2d42ff;
+        box-shadow: 0 12px 30px rgba(45, 66, 255, 0.08);
+      }
+      .reveal-info {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s 0.1s ease;
+      }
+      .revealed .reveal-info {
+        opacity: 1;
+        transform: translateY(0);
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        border-top: 1px solid #e5e7eb;
+      }
+      .badge {
+        background: #2d42ff;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        display: inline-block;
+      }
+
+      .particle {
+        position: fixed;
+        border-radius: 50%;
+        background-color: #2d42ff;
+        pointer-events: none;
+        z-index: 9999;
+        animation: explode 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+      }
+
+      @keyframes explode {
+        0% {
+          transform: scale(1) translate(0, 0);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(0) translate(var(--tx), var(--ty));
+          opacity: 0;
+        }
+      }
+
+      #progress-bar {
+        transition: width 0.3s ease;
+      }
+
+      .dash-line {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: draw 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      }
+      @keyframes draw {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      .fade-in-up {
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      }
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        scrollbar-width: none;
+      }
+
+      /* Premium Floating & Glowing animation for Badge on Page 1 */
+      @keyframes premiumFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+      @keyframes goldGlowPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 12px rgba(234, 179, 8, 0.08);
+          border-color: rgba(234, 179, 8, 0.15);
+        }
+        50% {
+          box-shadow: 0 0 22px rgba(234, 179, 8, 0.25);
+          border-color: rgba(234, 179, 8, 0.4);
+        }
+      }
+      .badge-float {
+        animation: premiumFloat 4s ease-in-out infinite,
+          goldGlowPulse 4s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body class="antialiased selection:bg-primary selection:text-white font-sans">
+    <!-- Top Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-gray-100 z-50">
+      <div id="progress-bar" class="h-full bg-primary w-0 rounded-r-full"></div>
+    </div>
+
+    <!-- UI Overlay (Persistent Branding Header & Controls) -->
+    <div
+      class="fixed top-6 left-6 right-6 flex justify-between items-center z-40 pointer-events-none"
+    >
+      <!-- Logo Stamp (Left) - Mathematically parallel Slant points perfectly matching the uploaded design -->
+      <div class="flex items-center gap-3 pointer-events-auto select-none">
+        <svg
+          viewBox="0 0 200 228"
+          class="h-6 w-auto text-dark hover:text-primary transition-colors"
+          fill="currentColor"
+        >
+          <!-- Bottom-left accent stroke -->
+          <polygon points="11,200 90,200 80,228 1,228" />
+          <!-- Main stylized geometric slanted "7" block -->
+          <polygon points="80,0 200,0 120,228 92,228 162.2,28 70.2,28" />
+        </svg>
+        <span
+          class="font-title font-extrabold tracking-widest text-[11px] uppercase text-dark"
+          >JIE CHEN</span
+        >
+      </div>
+
+      <!-- Navigation Controls (Right) -->
+      <div class="flex items-center gap-2 pointer-events-auto">
+        <div
+          class="glass-panel px-4 py-2 rounded-full shadow-sm border border-gray-100 flex items-center gap-2"
+        >
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span
+            id="slide-counter"
+            class="text-xs font-title font-bold tracking-wider text-gray-500"
+            >1 / 14</span
+          >
+        </div>
+        <button
+          id="menu-btn"
+          class="glass-panel p-2.5 rounded-full shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors interactive-element"
+          aria-label="Open presentation map"
+        >
+          <svg
+            class="w-4 h-4 text-dark"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div
+      class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-40 glass-panel px-6 py-3 rounded-full shadow-soft border border-gray-100"
+    >
+      <button
+        id="prev-btn"
+        class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-dark disabled:opacity-30 disabled:hover:bg-transparent"
+        aria-label="Previous slide"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+      </button>
+      <div id="dots-container" class="flex gap-2"></div>
+      <button
+        id="next-btn"
+        class="p-2 rounded-full hover:bg-gray-100 transition-colors text-dark"
+        aria-label="Next slide"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Menu Overlay -->
+    <div
+      id="menu-overlay"
+      class="fixed inset-0 bg-white/95 backdrop-blur-md z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col pt-24 px-8 pb-8 overflow-y-auto"
+    >
+      <button
+        id="close-menu-btn"
+        class="absolute top-6 right-6 p-3 rounded-full hover:bg-gray-100 transition-colors"
+      >
+        <svg
+          class="w-6 h-6 text-dark"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+      <h2
+        class="text-3xl font-title font-extrabold mb-8 text-left max-w-6xl mx-auto w-full"
+      >
+        Slide Index
+      </h2>
+      <div
+        id="menu-list"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-6xl mx-auto w-full"
+      ></div>
+    </div>
+
+    <main id="slides-container" class="w-full h-full relative">
+      <!-- Slide 1: Opening -->
+      <section class="slide active" id="slide-1" data-title="Opening">
+        <div
+          class="slide-content text-left flex flex-col justify-center h-full max-w-4xl"
+        >
+          <!-- Golden floating premium badge -->
+          <div
+            class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-50/70 text-yellow-800 text-xs font-bold tracking-wider mb-6 border border-yellow-200 w-fit badge-float transition-all"
+          >
+            <span>🏆</span> 1st Place Winner
+          </div>
+          <h1
+            class="text-4xl md:text-6xl lg:text-7xl font-title font-extrabold leading-none tracking-tight mb-6 text-dark"
+          >
+            From Labor Data to a <br /><span
+              class="text-primary relative inline-block"
+              >Personal Work Story
+              <svg
+                class="absolute w-full h-3 -bottom-2 left-0 text-primary opacity-30"
+                viewBox="0 0 100 10"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0 5 Q 50 10 100 5"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  fill="none"
+                />
+              </svg>
+            </span>
+          </h1>
+          <p
+            class="text-lg md:text-xl text-gray-500 max-w-2xl mb-10 leading-relaxed font-sans"
+          >
+            How I used Lovable to turn complex labor-rights data into an
+            interactive reflection experience.
+          </p>
+          <div
+            class="text-xs text-gray-400 max-w-md mb-12 uppercase tracking-wider font-semibold"
+          >
+            Hackathon Project — Build for Impact: Labor Rights Data Hackathon,
+            by Data & AI Stockholm in partnership with Lovable.
+          </div>
+          <button
+            onclick="nextSlide()"
+            class="interactive-element group relative px-8 py-4 bg-primary text-white rounded-full font-bold text-sm tracking-widest uppercase overflow-hidden transition-all hover:scale-105 shadow-glow w-fit"
+          >
+            <span class="relative z-10 flex items-center gap-3">
+              Start the story
+              <svg
+                class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                ></path>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Slide 3: Why This Idea -->
+      <section class="slide" id="slide-3" data-title="Why This Idea">
+        <div class="slide-content text-left max-w-3xl">
+          <h2
+            class="text-3xl md:text-5xl font-title font-extrabold mb-6 leading-tight"
+          >
+            Work is personal.<br /><span class="text-gray-400"
+              >Labor data often feels distant.</span
+            >
+          </h2>
+          <div
+            id="s3-reveal-container"
+            class="relative p-8 cursor-pointer interactive-element group mb-8"
+            onclick="revealS3()"
+          >
+            <div
+              class="absolute inset-0 bg-soft rounded-3xl border border-dashed border-gray-200 transition-transform duration-500 group-hover:scale-[1.01]"
+            ></div>
+            <div
+              id="s3-click-text"
+              class="relative z-10 text-primary font-title font-bold tracking-wider uppercase text-xs flex items-center gap-2 justify-center"
+            >
+              <svg
+                class="w-4 h-4 animate-pulse"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+              </svg>
+              Click to reveal the core question
+            </div>
+            <h3
+              id="s3-big-question"
+              class="relative z-10 text-2xl md:text-4xl font-title font-extrabold text-primary opacity-0 transform translate-y-2 transition-all duration-700 hidden text-center w-full"
+            >
+              "Where do I stand in the world of work?"
+            </h3>
+          </div>
+          <p
+            id="s3-subtext"
+            class="text-gray-500 opacity-0 transition-opacity duration-700 border-l border-gray-200 pl-4 text-sm italic font-sans"
+          >
+            Instead of only showing charts, I wanted the experience to feel more
+            like a reflection.
+          </p>
+        </div>
+      </section>
+
+      <!-- Slide 4: Data Translation Mapping (UPDATED) -->
+      <section class="slide" id="slide-4" data-title="Data Mapping">
+        <div class="slide-content max-w-5xl">
+          <div class="mb-10 text-left">
+            <h2
+              class="text-xs uppercase tracking-[0.2em] font-bold text-gray-400 mb-2"
+            >
+              Translation Layer
+            </h2>
+            <h1
+              class="text-3xl md:text-5xl font-title font-extrabold tracking-tight mb-4"
+            >
+              From Raw Data to Human Pillars
+            </h1>
+            <p class="text-gray-500 font-sans text-sm">
+              Click each dataset below to see the personal translation.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Mapping 1: Stability -->
+            <div
+              class="mapping-card p-6 rounded-3xl interactive-element"
+              onclick="this.classList.toggle('revealed')"
+            >
+              <span
+                class="text-[10px] font-title font-bold text-gray-400 uppercase tracking-widest block"
+                >Dataset 01</span
+              >
+              <h4 class="text-lg font-title font-bold text-dark mt-2">
+                Employed persons by job tenure
+              </h4>
+              <div class="reveal-info">
+                <span class="badge mb-3">STABILITY</span>
+                <p
+                  class="text-sm text-gray-600 font-sans leading-relaxed italic"
+                >
+                  Because job tenure shows how long people stay in their work.
+                </p>
+              </div>
+            </div>
+
+            <!-- Mapping 2: Access -->
+            <div
+              class="mapping-card p-6 rounded-3xl interactive-element"
+              onclick="this.classList.toggle('revealed')"
+            >
+              <span
+                class="text-[10px] font-title font-bold text-gray-400 uppercase tracking-widest block"
+                >Dataset 02</span
+              >
+              <h4 class="text-lg font-title font-bold text-dark mt-2">
+                Employment rate by sex
+              </h4>
+              <div class="reveal-info">
+                <span class="badge mb-3">ACCESS</span>
+                <p
+                  class="text-sm text-gray-600 font-sans leading-relaxed italic"
+                >
+                  Because employment rate shows how many people can participate
+                  in the labor market.
+                </p>
+              </div>
+            </div>
+
+            <!-- Mapping 3: Fairness -->
+            <div
+              class="mapping-card p-6 rounded-3xl interactive-element"
+              onclick="this.classList.toggle('revealed')"
+            >
+              <span
+                class="text-[10px] font-title font-bold text-gray-400 uppercase tracking-widest block"
+                >Dataset 03</span
+              >
+              <h4 class="text-lg font-title font-bold text-dark mt-2">
+                Gender pay gap in unadjusted form
+              </h4>
+              <div class="reveal-info">
+                <span class="badge mb-3">FAIRNESS</span>
+                <p
+                  class="text-sm text-gray-600 font-sans leading-relaxed italic"
+                >
+                  Because the pay gap shows inequality in earnings.
+                </p>
+              </div>
+            </div>
+
+            <!-- Mapping 4: Security -->
+            <div
+              class="mapping-card p-6 rounded-3xl interactive-element"
+              onclick="this.classList.toggle('revealed')"
+            >
+              <span
+                class="text-[10px] font-title font-bold text-gray-400 uppercase tracking-widest block"
+                >Dataset 04</span
+              >
+              <h4 class="text-lg font-title font-bold text-dark mt-2">
+                In-work at-risk-of-poverty rate by sex
+              </h4>
+              <div class="reveal-info">
+                <span class="badge mb-3">SECURITY</span>
+                <p
+                  class="text-sm text-gray-600 font-sans leading-relaxed italic"
+                >
+                  Because it shows whether having a job is enough to avoid
+                  poverty risk.
+                </p>
+              </div>
+            </div>
+
+            <!-- Mapping 5: Workload (Full width) -->
+            <div
+              class="mapping-card p-6 rounded-3xl interactive-element md:col-span-2"
+              onclick="this.classList.toggle('revealed')"
+            >
+              <span
+                class="text-[10px] font-title font-bold text-gray-400 uppercase tracking-widest block"
+                >Dataset 05</span
+              >
+              <h4 class="text-lg font-title font-bold text-dark mt-2">
+                Mean weekly hours usually worked per employee by sex — Annual
+              </h4>
+              <div class="reveal-info">
+                <span class="badge mb-3">WORKLOAD</span>
+                <p
+                  class="text-sm text-gray-600 font-sans leading-relaxed italic"
+                >
+                  Because weekly working hours show how much people usually
+                  work.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 5: Core Experience -->
+      <section class="slide" id="slide-5" data-title="Core Experience">
+        <div class="slide-content max-w-5xl">
+          <h2
+            class="text-3xl md:text-5xl font-title font-extrabold mb-3 text-left"
+          >
+            What the user can do
+          </h2>
+          <p class="text-gray-500 mb-8 text-left font-sans">
+            Streamlined interactive architecture planned with enough space.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              class="s5-card interactive-element bg-white rounded-2xl p-6 border border-gray-100 flex gap-4 transition-all duration-300 hover:border-primary active"
+              onclick="highlightS5Card(this)"
+            >
+              <div
+                class="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center font-title font-bold text-xs shrink-0 icon-container"
+              >
+                01
+              </div>
+              <div>
+                <h3
+                  class="font-title font-bold text-sm tracking-wide uppercase mb-2"
+                >
+                  Enter work profile
+                </h3>
+                <p class="text-xs text-gray-500 leading-relaxed font-sans">
+                  Localized parameters: country, gender, and hours.
+                </p>
+              </div>
+            </div>
+            <div
+              class="s5-card interactive-element bg-white rounded-2xl p-6 border border-gray-100 flex gap-4 transition-all duration-300 hover:border-primary"
+              onclick="highlightS5Card(this)"
+            >
+              <div
+                class="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-title font-bold text-xs shrink-0 icon-container"
+              >
+                02
+              </div>
+              <div>
+                <h3
+                  class="font-title font-bold text-sm tracking-wide uppercase mb-2"
+                >
+                  Explore dimensions
+                </h3>
+                <p class="text-xs text-gray-500 leading-relaxed font-sans">
+                  Interact with translated thematic data pillars.
+                </p>
+              </div>
+            </div>
+            <div
+              class="s5-card interactive-element bg-white rounded-2xl p-6 border border-gray-100 flex gap-4 transition-all duration-300 hover:border-primary"
+              onclick="highlightS5Card(this)"
+            >
+              <div
+                class="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-title font-bold text-xs shrink-0 icon-container"
+              >
+                03
+              </div>
+              <div>
+                <h3
+                  class="font-title font-bold text-sm tracking-wide uppercase mb-2"
+                >
+                  See a personal Work Map
+                </h3>
+                <p class="text-xs text-gray-500 leading-relaxed font-sans">
+                  The dry data becomes instantly relatable through an intuitive
+                  map visualization.
+                </p>
+              </div>
+            </div>
+            <div
+              class="s5-card interactive-element bg-white rounded-2xl p-6 border border-gray-100 flex gap-4 transition-all duration-300 hover:border-primary"
+              onclick="highlightS5Card(this)"
+            >
+              <div
+                class="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-title font-bold text-xs shrink-0 icon-container"
+              >
+                04
+              </div>
+              <div>
+                <h3
+                  class="font-title font-bold text-sm tracking-wide uppercase mb-2"
+                >
+                  Receive gentle AI reflection
+                </h3>
+                <p class="text-xs text-gray-500 leading-relaxed font-sans">
+                  Insightful prompts designed to guide thinking rather than
+                  assign numeric scores.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 6: Workflow Timeline -->
+      <section class="slide" id="slide-6" data-title="Workflow">
+        <div class="slide-content max-w-5xl">
+          <h2
+            class="text-3xl md:text-5xl font-title font-extrabold mb-4 text-left"
+          >
+            I started from context.
+          </h2>
+          <div
+            class="relative w-full overflow-hidden bg-white border border-gray-100 rounded-3xl p-6 md:p-8"
+          >
+            <div
+              id="workflow-detail"
+              class="mb-8 bg-soft p-6 rounded-2xl border border-gray-100 text-left min-h-[110px] flex flex-col justify-center transition-all duration-300"
+            >
+              <h4
+                id="workflow-detail-title"
+                class="font-title font-bold text-sm tracking-wider uppercase text-primary mb-1"
+              >
+                Connecting to real lives
+              </h4>
+              <p
+                id="workflow-detail-desc"
+                class="text-sm text-gray-600 font-sans"
+              >
+                What does this data mean for a real person? We began by defining
+                the emotional goal before datasets.
+              </p>
+            </div>
+            <div
+              class="absolute bottom-10 left-8 right-8 h-0.5 bg-gray-100 z-0 rounded-full hidden md:block"
+            ></div>
+            <div
+              class="relative z-10 flex md:justify-between items-center overflow-x-auto pb-4 pt-2 snap-x snap-mandatory hide-scrollbar gap-4 md:gap-0"
+              id="workflow-timeline"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 7: Context -->
+      <section class="slide" id="slide-7" data-title="Step 1: Context">
+        <div
+          class="slide-content flex flex-col md:flex-row gap-12 items-stretch max-w-5xl"
+        >
+          <div class="flex-1 text-left flex flex-col justify-center">
+            <h2
+              class="text-xs uppercase tracking-widest text-primary mb-2 font-bold"
+            >
+              Step 1
+            </h2>
+            <h3 class="text-2xl md:text-4xl font-title font-extrabold mb-6">
+              Understand the context
+            </h3>
+            <p class="text-gray-600 mb-6 font-sans">
+              Labor rights are personal; the design must reflect that depth.
+            </p>
+            <div
+              class="bg-gray-50 p-6 rounded-2xl border-l-2 border-dark mb-6 text-sm"
+            >
+              <p
+                class="font-bold uppercase tracking-wider text-xs mb-3 text-gray-400"
+              >
+                Essential Questions Raised:
+              </p>
+              <ul class="text-gray-600 space-y-2.5 list-disc list-inside">
+                <li>What does this data mean for a real person?</li>
+                <li>What kind of feeling should the product create?</li>
+                <li>What should the user understand after using it?</li>
+              </ul>
+            </div>
+          </div>
+          <div class="flex-1 grid grid-cols-2 gap-4">
+            <div
+              class="interactive-element interactive-card bg-white p-6 border border-gray-100 rounded-2xl text-left flex flex-col justify-between h-36"
+              onclick="toggleCardDetail(this)"
+            >
+              <div
+                class="text-primary font-title font-bold text-xs uppercase tracking-widest mb-2"
+              >
+                01
+              </div>
+              <span class="font-title font-bold text-base title">Personal</span>
+              <p class="text-xs text-gray-400 mt-2 hidden detail font-sans">
+                Bridge the gap to real lives.
+              </p>
+            </div>
+            <div
+              class="interactive-element interactive-card bg-white p-6 border border-gray-100 rounded-2xl text-left flex flex-col justify-between h-36"
+              onclick="toggleCardDetail(this)"
+            >
+              <div
+                class="text-primary font-title font-bold text-xs uppercase tracking-widest mb-2"
+              >
+                02
+              </div>
+              <span class="font-title font-bold text-base title">Clear</span>
+              <p class="text-xs text-gray-400 mt-2 hidden detail font-sans">
+                Translating metrics so they are easy to grasp quickly.
+              </p>
+            </div>
+            <div
+              class="interactive-element interactive-card bg-white p-6 border border-gray-100 rounded-2xl text-left flex flex-col justify-between h-36"
+              onclick="toggleCardDetail(this)"
+            >
+              <div
+                class="text-primary font-title font-bold text-xs uppercase tracking-widest mb-2"
+              >
+                03
+              </div>
+              <span class="font-title font-bold text-base title"
+                >Reflective</span
+              >
+              <p class="text-xs text-gray-400 mt-2 hidden detail font-sans">
+                Inviting deeper thought, not mindless tapping.
+              </p>
+            </div>
+            <div
+              class="interactive-element interactive-card bg-white p-6 border border-primary/20 rounded-2xl text-left flex flex-col justify-between h-36"
+              onclick="toggleCardDetail(this)"
+            >
+              <div
+                class="text-primary font-title font-bold text-xs uppercase tracking-widest mb-2"
+              >
+                04
+              </div>
+              <span class="font-title font-bold text-base title text-primary"
+                >Gentle</span
+              >
+              <p class="text-xs text-primary mt-2 hidden detail font-sans">
+                Avoiding harsh, judgmental scores and ranks.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 8: Step 2 Story -->
+      <section class="slide" id="slide-8" data-title="Step 2: Story">
+        <div class="slide-content max-w-5xl text-left">
+          <h2
+            class="text-xs uppercase tracking-widest text-primary mb-2 font-bold"
+          >
+            Step 2
+          </h2>
+          <h3
+            class="text-2xl md:text-4xl font-title font-extrabold mb-8 text-dark text-left"
+          >
+            The story structure
+          </h3>
+          <div class="flex flex-col lg:flex-row gap-8 items-stretch w-full">
+            <div class="grid grid-cols-2 gap-3 w-full lg:w-1/2">
+              <button
+                class="s8-dim interactive-element p-4 rounded-xl border border-gray-200 text-left hover:border-primary hover:bg-primary/5 transition-all flex items-center gap-3"
+                data-title="Work Access"
+                data-desc="Can people enter and participate freely in the labor market without friction?"
+              >
+                <span
+                  class="w-6 h-6 flex items-center justify-center border border-gray-200 rounded-md text-xs font-semibold"
+                  >A</span
+                >
+                <span
+                  class="font-title font-bold text-xs tracking-wider uppercase"
+                  >Work Access</span
+                >
+              </button>
+              <button
+                class="s8-dim interactive-element p-4 rounded-xl border border-gray-200 text-left hover:border-primary hover:bg-primary/5 transition-all flex items-center gap-3"
+                data-title="Pay Fairness"
+                data-desc="Are there significant, systemic gaps in income and opportunity?"
+              >
+                <span
+                  class="w-6 h-6 flex items-center justify-center border border-gray-200 rounded-md text-xs font-semibold"
+                  >B</span
+                >
+                <span
+                  class="font-title font-bold text-xs tracking-wider uppercase"
+                  >Pay Fairness</span
+                >
+              </button>
+              <button
+                class="s8-dim interactive-element p-4 rounded-xl border border-gray-200 text-left hover:border-primary hover:bg-primary/5 transition-all flex items-center gap-3"
+                data-title="Workload"
+                data-desc="How much time and cognitive energy are people spending at work?"
+              >
+                <span
+                  class="w-6 h-6 flex items-center justify-center border border-gray-200 rounded-md text-xs font-semibold"
+                  >C</span
+                >
+                <span
+                  class="font-title font-bold text-xs tracking-wider uppercase"
+                  >Workload</span
+                >
+              </button>
+              <button
+                class="s8-dim interactive-element p-4 rounded-xl border border-gray-200 text-left hover:border-primary hover:bg-primary/5 transition-all flex items-center gap-3"
+                data-title="Stability"
+                data-desc="Is the work situation built to last, or perpetually uncertain?"
+              >
+                <span
+                  class="w-6 h-6 flex items-center justify-center border border-gray-200 rounded-md text-xs font-semibold"
+                  >D</span
+                >
+                <span
+                  class="font-title font-bold text-xs tracking-wider uppercase"
+                  >Stability</span
+                >
+              </button>
+              <button
+                class="s8-dim interactive-element p-4 rounded-xl border border-gray-200 text-left hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-3 col-span-2"
+                data-title="Security"
+                data-desc="Are workers fundamentally protected against personal and macro work risks?"
+              >
+                <span
+                  class="w-6 h-6 flex items-center justify-center border border-gray-200 rounded-md text-xs font-semibold"
+                  >E</span
+                >
+                <span
+                  class="font-title font-bold text-xs tracking-wider uppercase"
+                  >Security</span
+                >
+              </button>
+            </div>
+            <div
+              class="w-full lg:w-1/2 bg-soft p-8 rounded-3xl border border-gray-100 flex flex-col justify-center min-h-[180px]"
+            >
+              <h4
+                id="s8-title"
+                class="text-xl font-title font-extrabold text-primary mb-2 uppercase tracking-wider text-left"
+              >
+                Select a Dimension
+              </h4>
+              <p
+                id="s8-desc"
+                class="text-sm text-gray-600 transition-opacity duration-300 leading-relaxed text-left font-sans"
+              >
+                Click any structural dimension on the left to see the narrative
+                translation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 9: Step 3 Personal -->
+      <section class="slide" id="slide-9" data-title="Step 3: Personal">
+        <div
+          class="slide-content flex flex-col lg:flex-row gap-12 items-center max-w-5xl"
+        >
+          <div class="flex-1 text-left flex flex-col justify-center w-full">
+            <h2
+              class="text-xs uppercase tracking-widest text-primary mb-2 font-bold"
+            >
+              Step 3
+            </h2>
+            <h3
+              class="text-2xl md:text-4xl font-title font-extrabold mb-4 text-dark"
+            >
+              Make it personal
+            </h3>
+            <p class="text-sm text-gray-600 mb-6 leading-relaxed font-sans">
+              Personalization bridges the gap between global statistics and
+              individual reality.
+            </p>
+            <p
+              class="text-[10px] font-title font-bold text-gray-400 mb-3 uppercase tracking-widest"
+            >
+              Add metrics to the active profile card
+            </p>
+            <div class="flex flex-wrap gap-2.5" id="s9-inputs">
+              <button
+                class="interactive-element px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all text-xs font-title font-bold uppercase tracking-wider"
+                onclick="addToProfile(this, 'Sweden')"
+              >
+                📍 Sweden
+              </button>
+              <button
+                class="interactive-element px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all text-xs font-title font-bold uppercase tracking-wider"
+                onclick="addToProfile(this, 'Female')"
+              >
+                👤 Female
+              </button>
+              <button
+                class="interactive-element px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all text-xs font-title font-bold uppercase tracking-wider"
+                onclick="addToProfile(this, '40 hrs')"
+              >
+                ⏱️ 40h/wk
+              </button>
+              <button
+                class="interactive-element px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all text-xs font-title font-bold uppercase tracking-wider"
+                onclick="addToProfile(this, '2 Years')"
+              >
+                📅 2Y Tenure
+              </button>
+            </div>
+          </div>
+          <div class="flex-1 w-full flex justify-start lg:justify-center">
+            <div
+              class="bg-white border border-gray-100 rounded-3xl p-8 w-full max-w-sm relative overflow-hidden shadow-soft"
+            >
+              <div class="w-full h-1 bg-primary absolute top-0 left-0"></div>
+              <h4
+                class="text-sm font-title font-bold uppercase tracking-wider mb-6 text-gray-400 flex items-center gap-2"
+              >
+                Active Profile
+              </h4>
+              <ul id="s9-profile-list" class="space-y-4 text-sm text-gray-500">
+                <li
+                  class="flex justify-between items-center border-b border-gray-100 pb-2 italic text-gray-400 text-xs"
+                  id="s9-empty-state"
+                >
+                  No inputs selected. Click buttons on left.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 10: Step 4 Language -->
+      <section class="slide" id="slide-10" data-title="Step 4: Language">
+        <div class="slide-content text-left max-w-3xl">
+          <h2
+            class="text-xs uppercase tracking-widest text-primary mb-2 font-bold"
+          >
+            Step 4
+          </h2>
+          <h3
+            class="text-2xl md:text-4xl font-title font-extrabold mb-4 text-dark"
+          >
+            Use gentle language
+          </h3>
+          <p class="text-sm text-gray-600 mb-8 leading-relaxed font-sans">
+            Design should focus on guidance and curiosity, never comparative
+            anxiety or negative ranking.
+          </p>
+          <div class="flex items-center gap-4 mb-8">
+            <span
+              id="label-judge"
+              class="font-title font-bold text-xs uppercase tracking-wider text-gray-400 transition-colors"
+              >Judgmental Tone</span
+            >
+            <button
+              id="lang-toggle"
+              class="interactive-element w-14 h-7 bg-gray-200 rounded-full relative focus:outline-none"
+              onclick="toggleLanguage()"
+            >
+              <div
+                id="lang-knob"
+                class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 transform translate-x-7"
+              ></div>
+            </button>
+            <span
+              id="label-gentle"
+              class="font-title font-bold text-xs uppercase tracking-wider text-primary transition-colors"
+              >Gentle Guidance</span
+            >
+          </div>
+          <div
+            class="relative min-h-[140px] bg-soft rounded-3xl p-8 border border-gray-100 flex items-center shadow-inner overflow-hidden"
+          >
+            <div
+              id="text-judge"
+              class="absolute inset-x-8 opacity-0 transform translate-y-2 transition-all duration-500 text-red-500 font-medium text-sm"
+            >
+              "Your country ranks low on security metrics. Your profile is below
+              baseline compared to neighboring nations."
+            </div>
+            <div
+              id="text-gentle"
+              class="absolute inset-x-8 opacity-100 transform translate-y-0 transition-all duration-500 text-primary font-medium text-base leading-relaxed bg-primary/5 p-4 rounded-xl border border-primary/10 font-sans"
+            >
+              "Your profile suggests a work situation with some stable signals,
+              but also areas worth noticing."
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 11: Step 5 AI Reflection -->
+      <section class="slide" id="slide-11" data-title="Step 5: AI">
+        <div
+          class="slide-content flex flex-col lg:flex-row gap-12 items-center max-w-5xl"
+        >
+          <div class="flex-1 text-left flex flex-col justify-center">
+            <h2
+              class="text-xs uppercase tracking-widest text-primary mb-2 font-bold"
+            >
+              Step 5
+            </h2>
+            <h3
+              class="text-2xl md:text-4xl font-title font-extrabold mb-4 text-dark"
+            >
+              AI reflection layer
+            </h3>
+            <p class="text-sm text-gray-600 mb-6 leading-relaxed font-sans">
+              The AI output summaries help users organize thoughts without
+              assigning authoritative value judgments.
+            </p>
+            <div
+              class="bg-gray-50 p-6 rounded-2xl border-l-2 border-primary mb-6 text-xs text-gray-500 space-y-2"
+            >
+              <li class="flex items-center gap-2">
+                ✓ Synthesizes intersectional factors
+              </li>
+              <li class="flex items-center gap-2">
+                ✓ Organizing user perspective
+              </li>
+              <li class="flex items-center gap-2">✓ Zero rigid grading</li>
+            </div>
+          </div>
+          <div class="flex-1 w-full">
+            <div
+              class="interactive-element group cursor-pointer relative bg-white p-8 rounded-3xl shadow-soft border border-gray-100 hover:border-primary transition-all w-full max-w-md"
+              onclick="cycleReflection()"
+            >
+              <div
+                class="absolute top-4 right-4 bg-primary text-white text-[9px] font-title font-bold uppercase tracking-wider px-3 py-1.5 rounded-full animate-bounce"
+              >
+                Cycle Ref
+              </div>
+              <p
+                id="ai-reflection-text"
+                class="text-lg text-dark leading-relaxed font-medium transition-opacity duration-300 font-sans italic pr-12"
+              >
+                "Your situation shows strong foundational stability, typical for
+                your region, but suggests a need to monitor workload balance."
+              </p>
+              <div class="mt-6 flex gap-1.5" id="ai-dots">
+                <span
+                  class="w-2.5 h-1 rounded-full bg-primary opacity-100"
+                ></span>
+                <span
+                  class="w-1.5 h-1 rounded-full bg-gray-200 opacity-50"
+                ></span>
+                <span
+                  class="w-1.5 h-1 rounded-full bg-gray-200 opacity-50"
+                ></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 12: Final Result -->
+      <section class="slide" id="slide-12" data-title="Final Product">
+        <div class="slide-content text-left max-w-5xl">
+          <h2
+            class="text-3xl md:text-5xl font-title font-extrabold mb-4 text-dark"
+          >
+            The final result
+          </h2>
+          <p class="text-sm text-gray-600 mb-8 max-w-2xl font-sans">
+            An interactive data story combining verified labor-rights statistics
+            with user context and gentle AI summary outputs.
+          </p>
+          <div
+            class="max-w-3xl bg-white rounded-3xl shadow-soft border border-gray-200 overflow-hidden transform transition-all hover:scale-[1.01] duration-500"
+          >
+            <div
+              class="bg-gray-50 px-6 py-3 flex items-center justify-between border-b border-gray-100 text-[10px] text-gray-400 font-mono"
+            >
+              <div class="flex gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-gray-200"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-gray-200"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-gray-200"></div>
+              </div>
+              <div
+                class="bg-white px-4 py-1.5 rounded-full border border-gray-100"
+              >
+                work-story-map.lovable.app
+              </div>
+              <div class="w-6"></div>
+            </div>
+            <div class="bg-white p-8 min-h-[220px]">
+              <span
+                class="text-[10px] font-title font-bold text-primary uppercase tracking-widest mb-2 block"
+                >Live Deployment</span
+              >
+              <h4 class="text-xl font-title font-extrabold text-dark mb-4">
+                Where Do I Stand in the World of Work?
+              </h4>
+              <a
+                href="https://work-story-map.lovable.app/"
+                target="_blank"
+                class="interactive-element px-6 py-3 bg-dark hover:bg-black text-white rounded-full text-xs font-title font-bold uppercase tracking-wider transition-colors shadow-lg inline-block w-fit mt-4"
+                >Open Live Project</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 13: Lovable Strengths -->
+      <section class="slide" id="slide-13" data-title="Lovable">
+        <div class="slide-content max-w-5xl">
+          <h2
+            class="text-3xl md:text-5xl font-title font-extrabold mb-8 text-dark"
+          >
+            Building with Lovable
+          </h2>
+          <div class="flex flex-col lg:flex-row gap-8 items-stretch">
+            <div
+              class="flex-1 space-y-3 h-[42vh] overflow-y-auto pr-2 hide-scrollbar"
+              id="s14-list"
+            ></div>
+            <div
+              class="w-full lg:w-1/3 bg-soft rounded-3xl border border-gray-100 p-8 flex flex-col items-center justify-center relative overflow-hidden h-40 lg:h-auto shrink-0"
+            >
+              <div class="text-center z-10">
+                <div
+                  class="text-5xl font-title font-extrabold text-primary mb-2"
+                  id="s14-counter"
+                >
+                  0/6
+                </div>
+                <div
+                  class="text-[10px] font-title font-bold text-gray-400 uppercase tracking-widest"
+                >
+                  Strengths collected
+                </div>
+              </div>
+              <div
+                id="s14-dots-container"
+                class="absolute inset-0 z-0 pointer-events-none"
+              ></div>
+              <div
+                class="absolute bottom-0 left-0 w-full bg-primary/10 transition-all duration-500 ease-out"
+                id="s14-fill"
+                style="height: 0%"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 14: Learnings -->
+      <section class="slide" id="slide-14" data-title="Learnings">
+        <div class="slide-content max-w-5xl">
+          <h2
+            class="text-3xl md:text-5xl font-title font-extrabold mb-8 text-dark"
+          >
+            What I learned
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
+            <div
+              class="interactive-card interactive-element bg-white p-6 rounded-2xl border border-gray-100 group"
+              onclick="toggleAnswer(this)"
+            >
+              <h4
+                class="font-title font-bold text-xs uppercase tracking-wider mb-1 group-[.open]:text-primary flex justify-between"
+              >
+                What story should be told? <span>+</span>
+              </h4>
+              <div
+                class="answer-content h-0 overflow-hidden opacity-0 transition-all duration-300"
+              >
+                <p
+                  class="text-xs text-gray-500 mt-2 border-t border-gray-100 pt-2 font-sans"
+                >
+                  Individual placement inside micro/macro structures.
+                </p>
+              </div>
+            </div>
+            <div
+              class="interactive-card interactive-element bg-white p-6 rounded-2xl border border-gray-100 group"
+              onclick="toggleAnswer(this)"
+            >
+              <h4
+                class="font-title font-bold text-xs uppercase tracking-wider mb-1 group-[.open]:text-primary flex justify-between"
+              >
+                What should be simplified? <span>+</span>
+              </h4>
+              <div
+                class="answer-content h-0 overflow-hidden opacity-0 transition-all duration-300"
+              >
+                <p
+                  class="text-xs text-gray-500 mt-2 border-t border-gray-100 pt-2 font-sans"
+                >
+                  Mapping extensive data into clean visual coordinates
+                  representing human concerns.
+                </p>
+              </div>
+            </div>
+            <div
+              class="interactive-card interactive-element bg-white p-6 rounded-2xl border border-gray-100 group"
+              onclick="toggleAnswer(this)"
+            >
+              <h4
+                class="font-title font-bold text-xs uppercase tracking-wider mb-1 group-[.open]:text-primary flex justify-between"
+              >
+                What should be avoided? <span>+</span>
+              </h4>
+              <div
+                class="answer-content h-0 overflow-hidden opacity-0 transition-all duration-300"
+              >
+                <p
+                  class="text-xs text-gray-500 mt-2 border-t border-gray-100 pt-2 font-sans"
+                >
+                  Averaging qualitative differences with aggressive scoring
+                  patterns or negative grading.
+                </p>
+              </div>
+            </div>
+            <div
+              class="interactive-card interactive-element bg-white p-6 rounded-2xl border border-gray-100 group"
+              onclick="toggleAnswer(this)"
+            >
+              <h4
+                class="font-title font-bold text-xs uppercase tracking-wider mb-1 group-[.open]:text-primary flex justify-between"
+              >
+                How should the user feel? <span>+</span>
+              </h4>
+              <div
+                class="answer-content h-0 overflow-hidden opacity-0 transition-all duration-300"
+              >
+                <p
+                  class="text-xs text-gray-500 mt-2 border-t border-gray-100 pt-2 font-sans"
+                >
+                  Informed, space-to-breathe, validated, and quietly prompted to
+                  evaluate work boundaries.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 15: Closing Reflection -->
+      <section class="slide" id="slide-15" data-title="Closing">
+        <div
+          class="slide-content text-left flex flex-col justify-center h-full max-w-4xl"
+        >
+          <h2
+            class="text-3xl md:text-5xl lg:text-6xl font-title font-extrabold mb-6 leading-tight text-dark"
+          >
+            From data to story,<br /><span class="text-gray-400"
+              >from story to product.</span
+            >
+          </h2>
+          <div
+            class="bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100 max-w-3xl relative overflow-hidden mb-12"
+          >
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>
+            <p
+              class="text-base md:text-xl font-medium text-dark italic font-sans"
+            >
+              "When designed carefully, data can help people see both themselves
+              and the bigger system around them."
+            </p>
+          </div>
+          <div
+            class="text-xs font-title font-bold text-primary tracking-widest uppercase mb-8"
+          >
+            Thank you.
+          </div>
+          <div
+            class="absolute bottom-0 right-0 opacity-10 pointer-events-none w-64 h-24"
+            id="s18-animation"
+          ></div>
+        </div>
+      </section>
+
+    </main>
+
+    <script>
+      let currentSlideIndex = 0;
+      const slides = document.querySelectorAll(".slide");
+      const totalSlides = slides.length;
+
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const dotsContainer = document.getElementById("dots-container");
+      const progressBar = document.getElementById("progress-bar");
+      const slideCounter = document.getElementById("slide-counter");
+      const menuBtn = document.getElementById("menu-btn");
+      const closeMenuBtn = document.getElementById("close-menu-btn");
+      const menuOverlay = document.getElementById("menu-overlay");
+      const menuList = document.getElementById("menu-list");
+
+      const workflowDetails = {
+        Context: {
+          title: "Connecting to real lives",
+          desc: "What does this data mean for a real person? We began by defining the emotional goal before the dataset.",
+        },
+        Dataset: {
+          title: "Finding the human core",
+          desc: "Filtering global metrics to extract essential themes: access, fairness, workload, stability, and security.",
+        },
+        Story: {
+          title: "Building the arc",
+          desc: "Structuring the journey as a progressive self-reflection, rather than a cold analytical report.",
+        },
+        Personalize: {
+          title: "Active user integration",
+          desc: "Designing localized inputs (region, gender, hours, tenure) to anchor personal stakes instantly.",
+        },
+        Language: {
+          title: "Non-judgmental guidance",
+          desc: "Crafting a soft tone of voice that promotes curiosity instead of comparative anxiety.",
+        },
+        AI: {
+          title: "Reflective summary",
+          desc: "Implementing a gentle LLM-assisted analysis layer to validate context mapping without sounding authoritative.",
+        },
+        Visuals: {
+          title: "Scandinavian minimalism",
+          desc: "Leveraging whitespace and fine-line geometries to make dense charts approachable and calm.",
+        },
+        Lovable: {
+          title: "Rapid execution",
+          desc: "Utilizing prompt-driven engineering to build interface screens and layouts within hackathon timeframes.",
+        },
+        Iteration: {
+          title: "Micro-UX polishing",
+          desc: "Refining details constantly—removing layout shifts and optimizing interaction paths.",
+        },
+        "Hand-in": {
+          title: "Ready build",
+          desc: "Publishing directly to live servers, maintaining immediate sharing momentum.",
+        },
+      };
+
+      function init() {
+        createDots();
+        createMenu();
+        updateUI();
+        setupEventListeners();
+        initSlideSpecifics();
+
+        if (window.location.hash) {
+          const index =
+            parseInt(window.location.hash.replace("#slide", "")) - 1;
+          if (!isNaN(index) && index >= 0 && index < totalSlides)
+            goToSlide(index);
+        }
+      }
+
+      function nextSlide() {
+        if (currentSlideIndex < totalSlides - 1)
+          goToSlide(currentSlideIndex + 1);
+      }
+      function prevSlide() {
+        if (currentSlideIndex > 0) goToSlide(currentSlideIndex - 1);
+      }
+
+      function goToSlide(index) {
+        slides.forEach((slide, i) => {
+          slide.classList.remove("active", "prev");
+          if (i < index) slide.classList.add("prev");
+        });
+        currentSlideIndex = index;
+        slides[currentSlideIndex].classList.add("active");
+        updateUI();
+        triggerSlideAnimations(index);
+        history.replaceState(null, null, `#slide${index + 1}`);
+      }
+
+      function updateUI() {
+        prevBtn.disabled = currentSlideIndex === 0;
+        nextBtn.classList.toggle(
+          "opacity-30",
+          currentSlideIndex === totalSlides - 1
+        );
+        nextBtn.style.pointerEvents =
+          currentSlideIndex === totalSlides - 1 ? "none" : "auto";
+        const progress = ((currentSlideIndex + 1) / totalSlides) * 100;
+        progressBar.style.width = `${progress}%`;
+        slideCounter.textContent = `${currentSlideIndex + 1} / ${totalSlides}`;
+        const dots = dotsContainer.querySelectorAll(".dot");
+        dots.forEach((dot, i) => {
+          dot.classList.toggle("bg-primary", i === currentSlideIndex);
+          dot.classList.toggle("w-6", i === currentSlideIndex);
+          dot.classList.toggle("bg-gray-200", i !== currentSlideIndex);
+          dot.classList.toggle("w-1.5", i !== currentSlideIndex);
+        });
+      }
+
+      function createDots() {
+        dotsContainer.innerHTML = "";
+        for (let i = 0; i < totalSlides; i++) {
+          const dot = document.createElement("button");
+          dot.className = `dot shrink-0 h-1.5 rounded-full transition-all duration-300 ${
+            i === 0 ? "w-6 bg-primary" : "w-1.5 bg-gray-200"
+          }`;
+          dot.addEventListener("click", () => goToSlide(i));
+          dotsContainer.appendChild(dot);
+        }
+      }
+
+      function createMenu() {
+        menuList.innerHTML = "";
+        slides.forEach((slide, i) => {
+          const title = slide.getAttribute("data-title") || `Slide ${i + 1}`;
+          const item = document.createElement("button");
+          item.className =
+            "text-left p-4 rounded-2xl border border-gray-100 hover:border-primary hover:bg-primary/5 transition-all focus:outline-none bg-white/50 backdrop-blur-sm group";
+          item.innerHTML = `
+                    <div class="text-[9px] font-title font-bold text-gray-400 tracking-wider mb-1 group-hover:text-primary transition-colors uppercase">Slide ${
+                      i + 1
+                    }</div>
+                    <div class="font-title font-bold text-dark text-xs uppercase tracking-wide">${title}</div>
+                `;
+          item.addEventListener("click", () => {
+            goToSlide(i);
+            toggleMenu(false);
+          });
+          menuList.appendChild(item);
+        });
+      }
+
+      function toggleMenu(show) {
+        menuOverlay.classList.toggle("opacity-0", !show);
+        menuOverlay.classList.toggle("pointer-events-none", !show);
+      }
+
+      function createParticles(e) {
+        const numParticles = 8;
+        for (let i = 0; i < numParticles; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          const size = Math.random() * 3 + 2;
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          const clientX = e.clientX || window.innerWidth / 2;
+          const clientY = e.clientY || window.innerHeight / 2;
+          particle.style.left = `${clientX - size / 2}px`;
+          particle.style.top = `${clientY - size / 2}px`;
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * 50 + 20;
+          particle.style.setProperty("--tx", `${Math.cos(angle) * distance}px`);
+          particle.style.setProperty("--ty", `${Math.sin(angle) * distance}px`);
+          document.body.appendChild(particle);
+          setTimeout(() => particle.remove(), 600);
+        }
+      }
+
+      function setupEventListeners() {
+        prevBtn.addEventListener("click", prevSlide);
+        nextBtn.addEventListener("click", nextSlide);
+        menuBtn.addEventListener("click", () => toggleMenu(true));
+        closeMenuBtn.addEventListener("click", () => toggleMenu(false));
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowRight" || e.key === "Space")
+            if (menuOverlay.classList.contains("opacity-0")) nextSlide();
+          if (e.key === "ArrowLeft")
+            if (menuOverlay.classList.contains("opacity-0")) prevSlide();
+          if (e.key === "Escape") toggleMenu(false);
+        });
+        document.addEventListener("click", (e) => {
+          if (e.target.closest(".interactive-element")) createParticles(e);
+        });
+      }
+
+      function initSlideSpecifics() {
+        const s2Chips = document.querySelectorAll(".s2-chip");
+        const s2Desc = document.getElementById("s2-desc");
+        s2Chips.forEach((chip) => {
+          chip.addEventListener("click", () => {
+            s2Chips.forEach((c) =>
+              c.classList.remove(
+                "border-primary",
+                "text-primary",
+                "bg-primary/5"
+              )
+            );
+            chip.classList.add(
+              "border-primary",
+              "text-primary",
+              "bg-primary/5"
+            );
+            s2Desc.textContent = chip.getAttribute("data-desc");
+            s2Desc.classList.remove("italic");
+          });
+        });
+
+        const timelineContainer = document.getElementById("workflow-timeline");
+        [
+          "Context",
+          "Dataset",
+          "Story",
+          "Personalize",
+          "Language",
+          "AI",
+          "Visuals",
+          "Lovable",
+          "Iteration",
+          "Hand-in",
+        ].forEach((step, i) => {
+          const node = document.createElement("button");
+          node.className = `interactive-element shrink-0 w-24 flex flex-col items-center gap-2 focus:outline-none group`;
+          node.innerHTML = `<div class="w-3.5 h-3.5 rounded-full bg-white border-2 border-gray-200 group-hover:border-primary transition-colors z-10 timeline-dot ${
+            i === 0 ? "border-primary bg-primary" : ""
+          }"></div><span class="text-[10px] font-title font-bold uppercase tracking-wider text-gray-400 group-hover:text-primary transition-colors">${step}</span>`;
+          node.addEventListener("click", () => {
+            document
+              .querySelectorAll(".timeline-dot")
+              .forEach((d) =>
+                d.classList.remove("border-primary", "bg-primary")
+              );
+            node
+              .querySelector(".timeline-dot")
+              .classList.add("border-primary", "bg-primary");
+            const config = workflowDetails[step];
+            if (config) {
+              const title = document.getElementById("workflow-detail-title");
+              const desc = document.getElementById("workflow-detail-desc");
+              title.style.opacity = 0;
+              desc.style.opacity = 0;
+              setTimeout(() => {
+                title.textContent = config.title;
+                desc.textContent = config.desc;
+                title.style.opacity = 1;
+                desc.style.opacity = 1;
+              }, 150);
+            }
+          });
+          timelineContainer.appendChild(node);
+        });
+
+        const s8Dims = document.querySelectorAll(".s8-dim");
+        const s8Title = document.getElementById("s8-title");
+        const s8Desc = document.getElementById("s8-desc");
+        s8Dims.forEach((dim) => {
+          dim.addEventListener("click", () => {
+            s8Dims.forEach((d) =>
+              d.classList.remove("border-primary", "bg-primary/5")
+            );
+            dim.classList.add("border-primary", "bg-primary/5");
+            s8Title.style.opacity = 0;
+            s8Desc.style.opacity = 0;
+            setTimeout(() => {
+              s8Title.textContent = dim.getAttribute("data-title");
+              s8Desc.textContent = dim.getAttribute("data-desc");
+              s8Title.style.opacity = 1;
+              s8Desc.style.opacity = 1;
+            }, 150);
+          });
+        });
+
+        const strengths = [
+          "Understands my prompts easily",
+          "Gives qualified delivery quickly",
+          "Supports fast iteration",
+          "Makes frontend building accessible",
+          "Turns abstract ideas into visible blocks",
+          "Publishes immediately to share link",
+        ];
+        const listContainer = document.getElementById("s14-list");
+        let collected = 0;
+        strengths.forEach((str) => {
+          const item = document.createElement("button");
+          item.className =
+            "interactive-element w-full text-left p-4 bg-white rounded-2xl border border-gray-100 hover:border-primary hover:shadow-sm transition-all focus:outline-none flex justify-between items-center group select-none";
+          item.innerHTML = `<span class="font-sans font-medium text-sm text-gray-600 group-hover:text-dark">${str}</span> <div class="w-5 h-5 rounded-full border border-gray-200 flex items-center justify-center text-transparent text-xs transition-colors checkmark shrink-0 ml-2">✓</div>`;
+          item.addEventListener("click", function h() {
+            this.removeEventListener("click", h);
+            this.classList.add("border-primary", "bg-primary/5");
+            const c = this.querySelector(".checkmark");
+            c.classList.replace("text-transparent", "text-primary");
+            c.classList.replace("border-gray-200", "border-primary");
+            collected++;
+            document.getElementById(
+              "s14-counter"
+            ).textContent = `${collected}/6`;
+            document.getElementById("s14-fill").style.height = `${
+              (collected / 6) * 100
+            }%`;
+            const d = document.createElement("div");
+            d.className =
+              "w-2 h-2 bg-primary rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 transition-all duration-1000";
+            document.getElementById("s14-dots-container").appendChild(d);
+            setTimeout(() => {
+              d.style.transform = `translate(${
+                (Math.random() - 0.5) * 120
+              }px, -${Math.random() * 120 + 30}px)`;
+              d.style.opacity = "0";
+            }, 50);
+          });
+          listContainer.appendChild(item);
+        });
+      }
+
+      function revealS3() {
+        document.getElementById("s3-click-text").style.display = "none";
+        const q = document.getElementById("s3-big-question");
+        q.classList.remove("hidden");
+        setTimeout(() => {
+          q.classList.remove("opacity-0", "translate-y-2");
+          document.getElementById("s3-subtext").classList.remove("opacity-0");
+        }, 50);
+      }
+      function highlightS5Card(el) {
+        document.querySelectorAll(".s5-card").forEach((c) => {
+          c.classList.remove("border-primary", "bg-primary/5");
+          const b = c.querySelector(".icon-container");
+          b.classList.replace("bg-primary/5", "bg-gray-100");
+          b.classList.replace("text-primary", "text-gray-400");
+        });
+        el.classList.add("border-primary", "bg-primary/5");
+        const b = el.querySelector(".icon-container");
+        b.classList.replace("bg-gray-100", "bg-primary/5");
+        b.classList.replace("text-gray-400", "text-primary");
+      }
+      function toggleCardDetail(el) {
+        const t = el.querySelector(".title"),
+          d = el.querySelector(".detail");
+        if (d.classList.contains("hidden")) {
+          t.classList.add(
+            "text-[11px]",
+            "text-gray-400",
+            "uppercase",
+            "tracking-widest"
+          );
+          t.classList.remove("text-base");
+          d.classList.remove("hidden");
+          d.classList.add("fade-in-up");
+        } else {
+          t.classList.remove(
+            "text-[11px]",
+            "text-gray-400",
+            "uppercase",
+            "tracking-widest"
+          );
+          t.classList.add("text-base");
+          d.classList.add("hidden");
+          d.classList.remove("fade-in-up");
+        }
+      }
+      let pItems = 0;
+      function addToProfile(btn, val) {
+        btn.classList.add(
+          "opacity-40",
+          "pointer-events-none",
+          "border-green-300",
+          "bg-green-50/50"
+        );
+        btn.innerHTML += " ✓";
+        const list = document.getElementById("s9-profile-list");
+        if (pItems === 0)
+          document.getElementById("s9-empty-state").style.display = "none";
+        const li = document.createElement("li");
+        li.className =
+          "flex justify-between items-center border-b border-gray-100 pb-2 fade-in-up text-xs font-sans";
+        li.innerHTML = `<span class="text-gray-400">${
+          btn.innerText.split(" ")[1]
+        }</span> <span class="font-semibold text-dark uppercase tracking-wider text-[11px]">${val}</span>`;
+        list.appendChild(li);
+        pItems++;
+      }
+      let isGentle = true;
+      function toggleLanguage() {
+        isGentle = !isGentle;
+        const k = document.getElementById("lang-knob"),
+          tJ = document.getElementById("text-judge"),
+          tG = document.getElementById("text-gentle"),
+          lJ = document.getElementById("label-judge"),
+          lG = document.getElementById("label-gentle");
+        if (isGentle) {
+          k.style.transform = "translateX(0)";
+          tG.style.opacity = "1";
+          tG.style.transform = "translateY(0)";
+          tJ.style.opacity = "0";
+          tJ.style.transform = "translateY(2px)";
+          lG.classList.replace("text-gray-400", "text-primary");
+          lJ.classList.replace("text-red-500", "text-gray-400");
+        } else {
+          k.style.transform = "translateX(1.75rem)";
+          tG.style.opacity = "0";
+          tG.style.transform = "translateY(2px)";
+          tJ.style.opacity = "1";
+          tJ.style.transform = "translateY(0)";
+          lG.classList.replace("text-primary", "text-gray-400");
+          lJ.classList.replace("text-gray-400", "text-red-500");
+        }
+      }
+      let refIndex = 0;
+      function cycleReflection() {
+        const refs = [
+          '"Your situation shows strong foundational stability, typical for your region, but suggests a need to monitor workload balance."',
+          '"While pay fairness aligns with broader trends, the dataset highlights access to advanced training as a space for focus."',
+          '"Your tenure indicates high security, though mapping against sector averages reveals shifts in working hours expectations."',
+        ];
+        refIndex = (refIndex + 1) % refs.length;
+        const t = document.getElementById("ai-reflection-text");
+        t.style.opacity = 0;
+        const dots = document.getElementById("ai-dots").children;
+        Array.from(dots).forEach((dot, i) => {
+          dot.classList.toggle("opacity-100", i === refIndex);
+          dot.classList.toggle("opacity-50", i !== refIndex);
+          dot.classList.toggle("bg-primary", i === refIndex);
+          dot.classList.toggle("bg-gray-200", i !== refIndex);
+          dot.classList.toggle("w-2.5", i === refIndex);
+          dot.classList.toggle("w-1.5", i !== refIndex);
+        });
+        setTimeout(() => {
+          t.textContent = refs[refIndex];
+          t.style.opacity = 1;
+        }, 300);
+      }
+      function toggleAnswer(el) {
+        const isExp = el.classList.contains("open"),
+          c = el.querySelector(".answer-content");
+        if (isExp) {
+          el.classList.remove("open");
+          c.style.height = "0px";
+          c.style.opacity = "0";
+        } else {
+          el.classList.add("open");
+          c.style.height = c.scrollHeight + "px";
+          c.style.opacity = "1";
+        }
+      }
+      function triggerSlideAnimations(index) {
+        if (slides[index] && slides[index].id === "slide-15") {
+          const container = document.getElementById("s18-animation");
+          container.innerHTML = `<svg class="w-full h-full" viewBox="0 0 200 50"><circle cx="20" cy="25" r="2.5" fill="#2D42FF" class="fade-in-up" style="animation-delay: 0.1s"/><circle cx="60" cy="15" r="2.5" fill="#2D42FF" class="fade-in-up" style="animation-delay: 0.3s"/><circle cx="100" cy="35" r="2.5" fill="#2D42FF" class="fade-in-up" style="animation-delay: 0.5s"/><circle cx="140" cy="20" r="2.5" fill="#2D42FF" class="fade-in-up" style="animation-delay: 0.7s"/><circle cx="180" cy="25" r="2.5" fill="#2D42FF" class="fade-in-up" style="animation-delay: 0.9s"/><path d="M 20 25 L 60 15 L 100 35 L 140 20 L 180 25" fill="none" stroke="#2D42FF" stroke-width="1.25" class="dash-line opacity-40" style="animation-delay: 1s"/></svg>`;
+        } else {
+          const ani = document.getElementById("s18-animation");
+          if (ani) ani.innerHTML = "";
+        }
+        const lines = slides[index].querySelectorAll(".dash-line");
+        lines.forEach((l) => {
+          l.style.animation = "none";
+          l.offsetHeight;
+          l.style.animation = null;
+        });
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>
