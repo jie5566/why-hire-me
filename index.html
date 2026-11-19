@@ -345,6 +345,17 @@ html.case-open { overflow: hidden; }
 .arch-n.acc span { color: var(--acc); }
 .arch figcaption { margin-top: 10px; color: var(--soft); }
 @media (max-width: 760px) { .arch-row, .arch-in { grid-template-columns: 1fr; } .arch-local { padding-top: 10px; } .arch-cap { position: static; display: block; margin: 0 2px 10px; line-height: 1.4; } }
+.hk { margin: 0; }
+.hk-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: stretch; }
+.hk-p { border: 1px dashed var(--soft); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.hk-cap { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--acc); padding: 0 2px; }
+.hk-in { display: grid; grid-template-columns: 1fr; gap: 8px; flex: 1; align-content: start; }
+.hk-s { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+.hk-s span { font-size: 9.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--soft); }
+.hk-s b { font-weight: 600; font-size: 13px; line-height: 1.3; }
+.hk figcaption { margin-top: 10px; color: var(--soft); }
+@media (max-width: 900px) { .hk-row { grid-template-columns: 1fr; } }
+@media (min-width: 521px) and (max-width: 900px) { .hk-in { grid-template-columns: 1fr 1fr; } }
 .case-films { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .case-films > div { min-width: 0; }
 .case-films iframe { display: block; width: 100%; aspect-ratio: 9 / 16; border: 0; border-radius: 8px; background: #10251b; }
@@ -1170,19 +1181,25 @@ var CASES = {
   'hackathon': {
     kicker: 'Build for Impact: Labor Rights Data Hackathon · 1st place',
     title: 'Idea to winning product in three hours',
-    lead: '"Where do I stand in the world of work?" Labour statistics turned into a personal Work Map, built and presented solo, and awarded 1st place.',
+    lead: '"Where do I stand in the world of work?" Labour statistics turned into a personal Work Map, built solo in 3 hours and awarded 1st place. Afterwards I gave a talk to the Lovable community on how I did it.',
     meta: [['Role', 'Product designer, UX, AI builder'], ['Team', 'Solo'], ['Time', '3 hours'], ['Event', 'Data & AI Stockholm × Lovable'], ['Result', '1st place']],
     img: [['assets/hackathon-cover.jpg', 'Desktop landing page of Where do I stand in the world of work, and a phone showing the work word Balanced with five work signals']],
-    task: 'Labour data (employment, gender pay gap, working hours, job tenure, in-work poverty) sits in reports and feels far from people\'s lives. Make it personal, in three hours, alone.',
+    task: 'Labour data (employment, gender pay gap, working hours, job tenure, in-work poverty) sits in reports and feels far from people\'s lives. Make it personal, in three hours, alone. With AI tools, building was not the hard part. Deciding what to build was.',
     action: [
-      '<b>Started from feeling, not data.</b> Before opening a dataset I asked what the product should make someone feel, and set four qualities: personal, clear, reflective, gentle.',
+      '<b>Spent the first minutes on judgment, not on building.</b> Three questions before opening any dataset: what does this data mean for a real person, what should the product make them feel, and what should they understand afterwards? The answer became four qualities: personal, clear, reflective, gentle.',
       '<b>Translated five datasets into human words.</b> Job tenure became <i>stability</i>, employment rate <i>access</i>, pay gap <i>fairness</i>, in-work poverty <i>security</i>, weekly hours <i>workload</i>.',
-      '<b>Made it personal.</b> A short work profile (country, gender, hours, tenure) moves people from statistics to "where do I stand?", ending in one work word, such as <i>Balanced</i>.',
-      '<b>Wrote the AI to be gentle.</b> Not "your country ranks low on security", but "your profile shows some stable signals, and some areas worth noticing".',
-      'Built, deployed and presented the live product in Lovable.'
+      '<b>Structured it as a story, not a dashboard.</b> Enter a short work profile (country, gender, hours, tenure), explore the five dimensions, see a personal Work Map, then receive a reflection.',
+      '<b>Wrote the tone as carefully as the interface.</b> Not "your country ranks low on security", but "your profile shows some stable signals, and some areas worth noticing". The AI layer helps people organise their thoughts, with no scores or rankings.',
+      '<b>Let Lovable carry the build.</b> Prompt-driven screens in a calm, Scandinavian visual style, constant small polish, then published straight to a live link.'
     ],
-    learning: 'The first minutes spent on framing saved the rest of the time. When AI talks about people\'s lives, tone is a product decision: the same data can inform or create anxiety.',
-    result: ['<b>1st place</b> at the Build for Impact: Labor Rights Data Hackathon.', 'A live, working product in 3 hours.', 'Later used as the case study in my <b>guest lecture</b> at Jönköping University, "AI as a Creative Work Partner".'],
+    html: '<figure class="hk" role="img" aria-label="The ten steps of my 3-hour process, in three phases. Frame: context, dataset, story. Design: personalise, language, AI, visuals. Build: Lovable, iteration, hand-in."><div class="hk-row" aria-hidden="true"><div class="hk-p"><span class="mono hk-cap">Frame</span><div class="hk-in" style="--n:3"><div class="hk-s"><span class="mono">01 · Context</span><b>What should it make people feel?</b></div><div class="hk-s"><span class="mono">02 · Dataset</span><b>Five datasets, five human themes</b></div><div class="hk-s"><span class="mono">03 · Story</span><b>A reflection, not a report</b></div></div></div><div class="hk-p"><span class="mono hk-cap">Design</span><div class="hk-in" style="--n:4"><div class="hk-s"><span class="mono">04 · Personalise</span><b>Country, gender, hours, tenure</b></div><div class="hk-s"><span class="mono">05 · Language</span><b>Gentle, never ranking</b></div><div class="hk-s"><span class="mono">06 · AI</span><b>Reflection, not judgment</b></div><div class="hk-s"><span class="mono">07 · Visuals</span><b>Calm Scandinavian minimalism</b></div></div></div><div class="hk-p"><span class="mono hk-cap">Build</span><div class="hk-in" style="--n:3"><div class="hk-s"><span class="mono">08 · Lovable</span><b>Prompt-driven screens</b></div><div class="hk-s"><span class="mono">09 · Iteration</span><b>Micro-UX polish</b></div><div class="hk-s"><span class="mono">10 · Hand-in</span><b>Published to a live link</b></div></div></div></div><figcaption class="mono">My 3-hour process · from the talk I gave to the Lovable community</figcaption></figure>',
+    learning: 'Under time pressure, judgment is the speed. Deciding what the product should make people feel, and what to leave out, took minutes and saved hours. AI tools turn ideas into visible screens fast, so the design decisions become the real work. And when AI talks about people\'s lives, tone is a product decision.',
+    result: [
+      '<b>1st place</b> at the Build for Impact: Labor Rights Data Hackathon.',
+      'A live, working product in 3 hours.',
+      '<b>Gave a talk to the Lovable community on Discord</b> about how I framed the problem, made the judgment calls and built it in 3 hours.',
+      'Later used as the case study in my <b>guest lecture</b> at Jönköping University, "AI as a Creative Work Partner".'
+    ],
     links: [['Open the live product', 'https://work-story-map.lovable.app/']]
   },
   'transparent-ai': {
