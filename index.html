@@ -1145,26 +1145,26 @@ var CASES = {
     ]
   },
   'easy-to-read': {
-    kicker: 'Degree project · accessibility',
+    kicker: 'Bachelor thesis · Jönköping University · 2025',
     title: 'Easy-to-Read: any web page, rewritten for people who struggle to read',
-    lead: 'A working tool I designed and coded myself. It simplifies any web page with a private, local LLM, and I tested it one to one with 9 people with reading difficulties.',
+    lead: 'A working tool I designed and coded myself. It rewrites any web page into Easy-to-Read language with a local LLM, and I tested it with readers who have ADHD and dyslexia.',
     chartSel: '.media.e2r', chartNote: 'Illustration of how the tool works, drawn for this portfolio.',
-    meta: [['Role', 'UX research, UX/UI, front-end and server code'], ['Team', 'Solo, with academic supervision'], ['Time', '16 weeks'], ['Stack', 'Figma, Node.js, Express, Puppeteer, LLaMA 3.2 via Ollama']],
-    task: 'Accessibility tools help people reach content, not understand it. Could AI simplify any web page for people with reading difficulties without losing its meaning or their privacy?',
+    meta: [['Role', 'UX research, UX/UI, front-end and server code'], ['Team', 'Solo, with academic supervision'], ['Time', '16 weeks · spring 2025'], ['Stack', 'Node.js, Express, Puppeteer, LLaMA 3.2 via Ollama, Postman, Figma']],
+    task: 'Many people find complex web text hard to read, especially people with ADHD, dyslexia or memory difficulties, and people reading in a new language. Accessibility tools help them reach content, not understand it. Could AI simplify any web page without losing its meaning, or their privacy?',
     action: [
-      'Turned research, Easy-to-Read guidelines, surveys and interviews into four principles: clarity over compression, preserve meaning, structure aids understanding, reduce cognitive load.',
-      'Designed a minimal flow: paste a URL, toggle between original and simplified. A toggle, not a split view, to cut overload and bias in testing.',
-      '<b>Wrote the code myself.</b> A Node.js and Express server; Puppeteer to open the page and pull out the readable text; LLaMA 3.2 running locally through Ollama\'s API, so nothing a reader opens leaves their machine.',
-      '<b>Treated the prompt as part of the product.</b> Turned the Easy-to-Read guidelines into a structured prompt: short sentences, simple words, clear structure, and no meaning lost.',
-      '<b>Validated in two steps.</b> First a questionnaire with a small A/B test (54 valid answers; the rest did not qualify). Then one-to-one tests with 9 people with reading difficulties, such as dyslexia and ADHD, using the real tool.'
+      'Turned research, the Easy-to-Read guidelines, surveys and interviews into four principles: clarity over compression, preserve meaning, structure aids understanding, reduce cognitive load.',
+      'Designed a minimal flow: paste a URL, then switch between original and simplified with a toggle. A toggle, not a split view, so readers take in one version at a time and don\'t just skim and compare.',
+      '<b>Wrote the code myself.</b> Node.js and Express with locally hosted API endpoints; Puppeteer to open the page and extract the text; LLaMA 3.2 through Ollama. I chose a local model on purpose: no reader data leaves the machine, which supports GDPR.',
+      '<b>Treated the prompt as part of the product.</b> Turned the Easy-to-Read guidelines into a fixed prompt: short sentences, simple words, clear structure, and no metaphors, idioms or abstract phrases.',
+      '<b>Debugged the model, not just the screen.</b> The longer the input, the harder LLaMA 3.2\'s output was to read: Flesch-Kincaid grade 5.9 for one paragraph, 11.68 for a full article. Prompt and parameter tuning barely helped. I benchmarked DeepSeek R1 (7.93) and GPT-4o (8.94) on the same article, and built a paragraph-by-paragraph version. It scored easier, but the text grew longer than the original, so I left it out.',
+      '<b>Validated in two steps.</b> An online survey with a randomised A/B order and timed reading (54 valid answers out of 92). Then one-to-one tests with 9 people who have reading challenges, including ADHD and dyslexia: timed reading, four factual comprehension questions and an interview.'
     ],
     html: '<figure class="arch" role="img" aria-label="How Easy-to-Read works. 1: the reader pastes a URL in the browser. 2: a Node.js and Express server receives it. 3: Puppeteer opens the page and extracts the readable text. 4: the text and a prompt built from the Easy-to-Read guidelines go to LLaMA 3.2 through the Ollama API. 5: the browser shows a toggle between the original and the simplified version. Steps 2 to 4 run on the reader\'s own machine, so no content is sent to the cloud."><div class="arch-row" aria-hidden="true"><div class="arch-n"><span class="mono">01 · Browser</span><b>Reader pastes a URL</b></div><div class="arch-local"><span class="mono arch-cap">On the reader\'s machine · nothing sent to the cloud</span><div class="arch-in"><div class="arch-n"><span class="mono">02 · Node.js + Express</span><b>Server receives the request</b></div><div class="arch-n"><span class="mono">03 · Puppeteer</span><b>Opens the page, extracts the text</b></div><div class="arch-n acc"><span class="mono">04 · Ollama API</span><b>LLaMA 3.2 + my E2R prompt</b></div></div></div><div class="arch-n"><span class="mono">05 · Front end</span><b>Toggle: original ↔ easy to read</b></div></div><figcaption class="mono">How it works · the whole chain, coded by me</figcaption></figure>',
-    learning: 'Building the whole chain myself, from the page request to the model\'s answer, showed me where AI products really break: messy input, the prompt, speed and privacy. That is the language engineers speak, so I can design within those limits from the first sketch instead of finding them at handoff. And testing showed a trade-off I couldn\'t see on paper: simplify too far and nuance is lost.',
+    learning: 'Building the whole chain myself, from the page request to the model\'s answer, showed me where AI products really break: input length, the prompt, the choice of model, speed and privacy. That is the language engineers speak, so I can design within those limits from the first sketch instead of finding them at handoff. Readability is also not one number: the version that scored best was too long to use, and readers wanted easier text but still cared about detail, tone and trust.',
     result: [
-      '<b>In the questionnaire A/B test, 69% of the 54 valid answers preferred the simplified version.</b>',
-      'The one-to-one tests let me watch 9 people with reading difficulties use the real tool, beyond what a questionnaire can measure.',
-      'Validated that a local, private LLM can make real web content easier to understand.',
-      'Next: user-controlled simplification levels and better protection of nuance.'
+      '<b>Online survey: 69% (37 of 54) chose the AI version</b>, and read it 32.9 seconds faster on average (96.8 s vs 129.7 s). The difference was statistically significant (p = 0.0037).',
+      '<b>One-to-one tests: reading time dropped by over 82%</b> (12 min 35 s → 2 min 9 s). All nine answered all four comprehension questions correctly, and 8 of 9 said the AI version was easier to read.',
+      'The honest trade-off: 5 of 9 felt it was too simplified or casual. Next: user-controlled simplification levels, keeping key details, and a more natural tone.'
     ]
   },
   'hackathon': {
