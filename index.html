@@ -345,6 +345,7 @@ html.case-open { overflow: hidden; }
 .case-links a:hover, .case-end a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .live-cta { position: relative; display: inline-flex; width: fit-content; justify-self: start; align-self: flex-start; align-items: center; gap: 12px; margin: 26px 0 0; padding: 14px 22px 14px 18px; border-radius: 999px; background: var(--ink); color: var(--bg); font-weight: 600; font-size: 16px; letter-spacing: -0.005em; text-decoration: none; animation: liveRing 2.8s var(--ease) infinite; transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
 .live-cta:hover { transform: translateY(-2px); }
+.case-links a.live-cta, .case-links a.live-cta:hover { color: var(--bg); text-decoration: none; }
 .live-cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .live-cta .ld { position: relative; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
 .live-cta .ld::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: currentColor; animation: livePing 2s ease-out infinite; }
