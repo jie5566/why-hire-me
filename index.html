@@ -282,6 +282,17 @@ a.card:hover .media.cover { border-color: var(--acc); }
 .learn li b { font-weight: 600; font-size: 20px; letter-spacing: -0.01em; }
 .learn li span { color: var(--soft); }
 .learn-st { color: var(--soft); }
+.learn { position: relative; overflow: hidden; border-color: color-mix(in srgb, var(--acc) 35%, var(--line)); background: color-mix(in srgb, var(--acc) 4%, transparent); }
+.learn-tag { display: inline-flex; align-items: center; gap: 10px; }
+.live { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--acc); flex: none; }
+.live::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--acc); animation: livePulse 1.8s ease-out infinite; }
+@keyframes livePulse { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(3.2); opacity: 0; } }
+.learn-bar { position: relative; display: block; height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; margin-top: -8px; }
+.learn-bar i { position: absolute; top: 0; bottom: 0; left: 0; width: 38%; border-radius: 2px; background: var(--acc); animation: learnRun 2.6s cubic-bezier(.6, 0, .4, 1) infinite; }
+@keyframes learnRun { 0% { transform: translateX(-100%); } 100% { transform: translateX(270%); } }
+.learn::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 35%, color-mix(in srgb, var(--acc) 10%, transparent) 50%, transparent 65%); transform: translateX(-100%); animation: learnSheen 5s ease-in-out 1s infinite; }
+@keyframes learnSheen { 0%, 60% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .live::after, .learn-bar i, .learn::before { animation: none; } .learn-bar i { width: 50%; } }
 
 /* case reader */
 html.case-open { overflow: hidden; }
@@ -419,12 +430,13 @@ html.case-open { overflow: hidden; }
           <span class="more">Case study →</span>
         </a>
         <div class="learn rv">
-          <span class="tag mono">Learning now · AI product management</span>
+          <span class="tag mono learn-tag"><i class="live" aria-hidden="true"></i>Learning now · AI product management</span>
           <ul>
             <li><b>Microsoft</b><span>AI Product Manager Professional Certificate</span></li>
             <li><b>Duke University</b><span>AI Product Management Specialization</span></li>
           </ul>
           <span class="mono learn-st">Both in progress</span>
+          <span class="learn-bar" aria-hidden="true"><i></i></span>
         </div>
       </div>
     </div>
