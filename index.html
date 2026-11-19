@@ -174,6 +174,15 @@ img { max-width: 100%; display: block; }
 a.card:hover .media img { transform: scale(1.03); }
 .slot { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; text-align: center; border: 1px dashed var(--line); border-radius: 6px; color: var(--ph-ink); }
 .todo { color: var(--acc); }
+.carousel { margin: 0 0 clamp(36px, 5vw, 64px); }
+.car-head { max-width: 62ch; margin-bottom: 22px; }
+.car-head h3 { font-family: var(--display); font-size: clamp(26px, 3vw, 38px); letter-spacing: -0.02em; line-height: 1.1; margin: 12px 0 10px; }
+.car-head p { color: var(--soft); }
+.car-strip { display: flex; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; border-radius: 8px; cursor: grab; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.car-strip.drag { cursor: grabbing; scroll-snap-type: none; }
+.car-strip img { display: block; height: clamp(300px, 28vw, 400px); width: auto; flex: none; scroll-snap-align: start; user-select: none; }
+.car-strip:focus-visible { outline: 2px solid var(--acc); outline-offset: 4px; }
+.carousel figcaption { margin-top: 12px; color: var(--soft); }
 .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
 .gallery .media { aspect-ratio: 3 / 4; }
 .gallery figure { margin: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -636,7 +645,16 @@ html.case-open { overflow: hidden; }
     <div class="ch-in">
       <p class="ch-num mono rv">05 / Render — visual &amp; brand</p>
       <h2 class="disp rv" id="visual-h">Then make it look right.</h2>
-      <p class="ch-body rv">My visual side, in three kinds of work: brand identities, campaigns, and films and imagery made with AI. Each one starts from a single visual idea and follows it everywhere.</p>
+      <p class="ch-body rv">My visual side: commercial imagery, brand identities, campaigns, and films made with AI. Each one starts from a single visual idea and follows it everywhere.</p>
+      <figure class="carousel rv">
+        <div class="car-head">
+          <span class="tag mono">Transparent · Instagram carousel · published Nov 2026</span>
+          <h3>One frame, one blue cord</h3>
+          <p>Six slides, one continuous picture. A repeating white frame holds every product, and a single blue cord runs through all six slides, leading the eye from one product to the next. Unusual camera angles make familiar products feel new, while colour and light stay true to the brand. Made fast, approved and published by the team.</p>
+        </div>
+        <div class="car-strip" tabindex="0" role="group" aria-label="Instagram carousel, six slides; scroll sideways to follow the cord"><img src="assets/tr-carousel-1.jpg" alt="Slide 1 of 6: Black Transparent speaker seen from an unusual high side angle, a blue cord running along the floor" loading="lazy" draggable="false"><img src="assets/tr-carousel-2.jpg" alt="Slide 2 of 6: Transparent Speaker in its open black frame, the blue cord looping once below it" loading="lazy" draggable="false"><img src="assets/tr-carousel-3.jpg" alt="Slide 3 of 6: White Acoustic Sculpture speaker, the blue cord rising gently beneath it" loading="lazy" draggable="false"><img src="assets/tr-carousel-4.jpg" alt="Slide 4 of 6: Transparent turntable seen from a low side angle between glass plates, the cord continuing" loading="lazy" draggable="false"><img src="assets/tr-carousel-5.jpg" alt="Slide 5 of 6: Light grey speaker seen from the back, the cord lifting in a soft wave" loading="lazy" draggable="false"><img src="assets/tr-carousel-6.jpg" alt="Slide 6 of 6: Transparent turntable on its glass stand with the lid open, the cord ending the series" loading="lazy" draggable="false"></div>
+        <figcaption class="mono">Drag or scroll sideways · follow the cord →</figcaption>
+      </figure>
       <div class="gallery">
         <figure class="rv"><div class="media"><img src="assets/v-sumi.jpg" alt="SUMI furniture brand: packaging with a brush-circle logo" loading="lazy"></div><figcaption class="mono">Brand identity · SUMI</figcaption></figure>
         <figure class="rv"><div class="media"><img src="assets/v-nortint.jpg" alt="Nortint Dry Gin bottle identity" loading="lazy"></div><figcaption class="mono">Brand identity · Nortint gin</figcaption></figure>
@@ -1362,6 +1380,16 @@ var TOOLS_UL = '<ul class="tl"><li><span class="mono tl-k">Mood</span><b>Midjour
     }
   });
   route();
+})();
+
+(function () {
+  document.querySelectorAll('.car-strip').forEach(function (el) {
+    var down = false, x0 = 0, s0 = 0, moved = false;
+    el.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; down = true; moved = false; x0 = e.clientX; s0 = el.scrollLeft; el.classList.add('drag'); });
+    window.addEventListener('pointermove', function (e) { if (!down) return; var d = e.clientX - x0; if (Math.abs(d) > 3) moved = true; el.scrollLeft = s0 - d; });
+    window.addEventListener('pointerup', function () { if (!down) return; down = false; el.classList.remove('drag'); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { el.scrollBy({ left: el.clientWidth * .6, behavior: 'smooth' }); e.preventDefault(); } if (e.key === 'ArrowLeft') { el.scrollBy({ left: -el.clientWidth * .6, behavior: 'smooth' }); e.preventDefault(); } });
+  });
 })();
 </script>
 </body>
