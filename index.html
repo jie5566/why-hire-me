@@ -120,6 +120,13 @@ img { max-width: 100%; display: block; }
 .card .tag { color: var(--soft); }
 .card .more { margin-top: 4px; font-size: 14px; font-weight: 500; color: var(--acc); }
 .card.note { padding: 26px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); transition: background-color .6s, border-color .6s; }
+.tools .tl { list-style: none; margin: 22px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.tools .tl li { background: var(--card); padding: 16px; display: flex; flex-direction: column; gap: 6px; transition: background-color .6s; }
+.tools .tl-k { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--acc); }
+.tools .tl li b { font-weight: 600; font-size: 15px; }
+.tools .tl-d { font-size: 13px; line-height: 1.45; color: var(--soft); }
+@media (max-width: 900px) { .tools .tl { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .tools .tl { grid-template-columns: 1fr; } }
 .card.note.feature { background: var(--acc); border-color: var(--acc); color: var(--on-acc); }
 .card.note.feature p, .card.note.feature .tag { color: var(--on-acc); opacity: .85; }
 .media { position: relative; overflow: hidden; border-radius: 6px; background: var(--ph); aspect-ratio: 4 / 3; transition: background-color .6s; }
@@ -359,6 +366,14 @@ html.case-open { overflow: hidden; }
 .hk figcaption { margin-top: 10px; color: var(--soft); }
 @media (max-width: 900px) { .hk-row { grid-template-columns: 1fr; } }
 @media (min-width: 521px) and (max-width: 900px) { .hk-in { grid-template-columns: 1fr 1fr; } }
+.case-tools { margin: 0; }
+.case-tools .tl { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.case-tools .tl li { background: var(--card); padding: 14px; display: flex; flex-direction: column; gap: 5px; }
+.case-tools .tl-k { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--acc); }
+.case-tools .tl li b { font-weight: 600; font-size: 15px; }
+.case-tools .tl-d { font-size: 13px; line-height: 1.45; color: var(--soft); }
+.case-tools figcaption { margin-top: 10px; color: var(--soft); }
+@media (max-width: 480px) { .case-tools .tl { grid-template-columns: 1fr; } }
 .case-deck { margin: 0; }
 .deck-box { position: relative; width: 100%; aspect-ratio: 16 / 10; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
 .deck-box iframe { position: absolute; top: 0; left: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; transform: scale(var(--ds, .58)); }
@@ -549,7 +564,7 @@ html.case-open { overflow: hidden; }
     <div class="ch-in">
       <p class="ch-num mono rv">04 / Generate — AI</p>
       <h2 class="disp rv" id="ai-h">AI that gets it exactly right.</h2>
-      <p class="ch-body rv">In commercial work, AI is only useful if the product looks exactly like the product. I connect AI and traditional tools into workflows that a team of critical designers will sign off.</p>
+      <p class="ch-body rv">In commercial work, AI is only useful if the product looks exactly like the product. I know what each AI tool does best, and connect them with traditional tools into workflows that a team of critical designers will sign off.</p>
       <div class="cards">
         <a class="card wide rv" href="#transparent-ai">
           <div class="media"><img src="assets/tr-stand.jpg" alt="Transparent turntable on its stand behind ribbed glass, a figure walking past" loading="lazy"></div>
@@ -558,6 +573,12 @@ html.case-open { overflow: hidden; }
           <p>Product-accurate AI images, now live on Transparent's Instagram and website, made without a photoshoot or set building.</p>
           <span class="more">Case study →</span>
         </a>
+        <div class="card wide note tools rv">
+          <span class="tag mono">Right tool, right job</span>
+          <h3>I know what each AI tool is best at, and when to use it</h3>
+          <p>No single model does everything well. Choosing the right one for each step is what makes the result fast <i>and</i> exact.</p>
+          <ul class="tl"><li><span class="mono tl-k">Mood</span><b>Midjourney</b><span class="tl-d">First looks, new scenes and art direction, when the feeling matters most.</span></li><li><span class="mono tl-k">Consistency</span><b>Nano Banana</b><span class="tl-d">Keeping the same product or model true across angles and edits.</span></li><li><span class="mono tl-k">Precise edits</span><b>ChatGPT image</b><span class="tl-d">Targeted changes that follow exact instructions, like a new background.</span></li><li><span class="mono tl-k">Motion</span><b>Seedance</b><span class="tl-d">Turning approved stills into short video, together with Midjourney.</span></li><li><span class="mono tl-k">Film</span><b>Veo · Runway</b><span class="tl-d">Longer shots and branded video, directed shot by shot.</span></li><li><span class="mono tl-k">Sound</span><b>ElevenLabs · Suno</b><span class="tl-d">Voice and music, so a film is finished, not just generated.</span></li><li><span class="mono tl-k">All in one</span><b>ArtCraft · Artlist</b><span class="tl-d">Several models in one place, when a project needs many of them at once.</span></li><li><span class="mono tl-k">Precision</span><b>Adobe</b><span class="tl-d">Selections, retouching and the final pixel, wherever AI drifts.</span></li></ul>
+        </div>
         <div class="card note feature rv">
           <span class="tag mono">Built it myself</span>
           <h3>An agent that remembers the brief</h3>
@@ -1221,11 +1242,12 @@ var CASES = {
     action: [
       '<b>Noticed what I kept repeating.</b> For the first images I explained the same brand context, product facts and tone every time, and ran the same steps in the same order. That was the signal to build a system.',
       '<b>Built my own AI agent around it.</b> The repeated context and the repeated steps live in the agent, so each new image starts from the brief instead of a re-explanation, and my time goes to the decisions only I can make.',
-      '<b>Kept the real product as the base.</b> Real product photos in, AI for new angles, scenes and edits, then strict selections and retouching in Adobe wherever AI drifts on detail.',
+      '<b>Chose the right tool for each step.</b> I know what each AI tool does best: Midjourney for mood, Nano Banana for keeping the product consistent, ChatGPT image for precise edits, Seedance for motion. Real product photos are always the base, and Adobe handles the final precision wherever AI drifts.',
       '<b>Judged every image with a designer\'s eye.</b> AI gives many options and most are almost right. I choose what fits the brand\'s light, materials and calm, reject anything with a flaw however small, and fix the rest by hand. Only flawless images leave my desk.',
       '<b>Translated InDesign layouts through AI:</b> a 21-page document into dozens of languages, layout intact, with no copy-paste.'
     ],
     html: '<figure class="arch wf" role="img" aria-label="My AI content workflow at Transparent in six steps: 1, I spot the context and steps I keep repeating. 2, an AI agent holds the brand context, product facts, tone and repeated steps. 3, real product photos are the base. 4, AI generates new angles and scenes. 5, I judge every image, reject any flaw and retouch in Adobe. 6, the design team reviews and it is published. Steps 1 and 5 are my judgment."><div class="wf-grid" aria-hidden="true"><div class="arch-n acc"><span class="mono">01 · Me</span><b>Spot the repeats</b><em>Which context did I explain every time? Which steps did I repeat?</em></div><div class="arch-n"><span class="mono">02 · Agent</span><b>Set up once</b><em>Brand context, product facts, tone and the repeated steps</em></div><div class="arch-n"><span class="mono">03 · Base</span><b>The real product</b><em>Real product photos in, so the product stays true</em></div><div class="arch-n"><span class="mono">04 · AI</span><b>Generate &amp; edit</b><em>New angles and scenes in Midjourney, ChatGPT image, Nano Banana</em></div><div class="arch-n acc"><span class="mono">05 · Me</span><b>Judge every image</b><em>Select for light, material and calm; reject any flaw; retouch in Adobe</em></div><div class="arch-n"><span class="mono">06 · Team</span><b>Designer review</b><em>Approved, then published on Instagram and the website</em></div></div><figcaption class="mono">The workflow · highlighted steps are where my judgment goes</figcaption></figure>',
+    toolsSel: '.tools',
     learning: 'AI makes images cheap; taste and judgment decide which ones are worth publishing. The leverage comes from noticing what repeats and putting it into a system, so my attention goes to the aesthetic decisions. With a team of designers reviewing, "almost right" doesn\'t pass.',
     result: [
       '<b>First usable, on-brand product image in 2 days</b>, against an estimated 2–3 weeks and tens of thousands of SEK for a shoot.',
@@ -1249,6 +1271,7 @@ var CASES = {
     h += '<section><p class="case-k mono">T — Task</p><p>' + c.task + '</p></section>';
     h += '<section><p class="case-k mono">A — Action</p><ul>' + c.action.map(function (a) { return '<li>' + a + '</li>'; }).join('') + '</ul></section>';
     if (c.html) h += c.html;
+    if (c.toolsSel) { var tm = document.querySelector(c.toolsSel); if (tm) h += '<figure class="case-tools">' + tm.querySelector('.tl').outerHTML + '<figcaption class="mono">Right tool, right job · what each tool is best at</figcaption></figure>'; }
     if (c.deck) h += '<figure class="case-deck"><div class="deck-box"><iframe src="' + c.deck[0] + '" title="' + c.deck[1].replace(/"/g, '&quot;') + '" loading="lazy"></iframe></div><figcaption class="mono"><span>' + c.deck[2] + '</span><a href="' + c.deck[0] + '" target="_blank" rel="noopener">Open full screen ↗</a></figcaption></figure>';
     if (c.figs) h += c.figs.map(function (q) { return '<figure class="case-fig"><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></figure>'; }).join('');
     if (c.pair) h += '<figure class="case-pair' + (c.pairNatural ? ' natural' : '') + '">' + c.pair.map(function (q) { return '<div><img src="' + q[0] + '" alt="' + q[1].replace(/"/g, '&quot;') + '" loading="lazy"><figcaption class="mono">' + q[2] + '</figcaption></div>'; }).join('') + '</figure>';
