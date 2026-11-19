@@ -175,7 +175,8 @@ a.card:hover .media img { transform: scale(1.03); }
   .nav { display: none; }
   .cta { display: none; }
   .hdr { height: 64px; }
-  .ch { min-height: 0; padding: 18vh var(--pad) 10vh; }
+  /* each chapter opens with its own stage: the object morphs there and scrolls with it */
+  .ch { min-height: 0; padding: calc(var(--slot, 0px) + 5vh) var(--pad) 10vh; }
   .ch-in, .about-in { max-width: none; }
   .cards { grid-template-columns: minmax(0, 1fr); }
   .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -777,7 +778,7 @@ html.case-open { overflow: hidden; }
   } catch (err) { glOK = false; if (window.console) console.warn('Metal shader unavailable, keeping the point cloud', err); }
 
   /* ---------------- layout: where the object sits ---------------- */
-  var vw = 0, vh = 0, dpr = 1, narrow = false, HERO = {}, CHAP = {};
+  var vw = 0, vh = 0, dpr = 1, narrow = false, HERO = {}, CHAP = {}, SLOT = 0;
   var stageEls = doc.querySelectorAll('[data-stage]');
   function layout() {
     vw = window.innerWidth; vh = window.innerHeight; dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -786,8 +787,11 @@ html.case-open { overflow: hidden; }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (narrow) {
       HERO = { x: vw * 0.78, y: vh * 0.4, s: Math.min(vw / 390 * 0.62, vh / 844 * 0.95) };
-      CHAP = { x: vw / 2, y: 32, s: 0.155 };
+      CHAP = { x: vw / 2, y: vh * 0.4, s: Math.min(0.6, vw / 390 * 0.6) };
+      SLOT = Math.round(440 * CHAP.s + 70);
+      root.style.setProperty('--slot', SLOT + 'px');
     } else {
+      root.style.setProperty('--slot', '0px');
       HERO = { x: vw * 0.58, y: vh * 0.47, s: Math.min(vh / 900 * 1.7, vw / 1440 * 2.0) };
       CHAP = { x: vw * 0.78, y: vh * 0.5 + 16, s: Math.min(vh / 900 * 1.4, vw / 1440 * 1.65) };
     }
@@ -824,6 +828,16 @@ html.case-open { overflow: hidden; }
     md += ((root.getAttribute('data-mode') === 'dark' ? 1 : 0) - md) * (reduce ? 1 : 0.07);
     lmx += (mx - lmx) * 0.08; lmy += (my - lmy) * 0.08;
 
+    /* narrow screens: the object lives in the stage slot at the top of the nearest chapter */
+    if (narrow) {
+      var best = 1e9, by = vh * 0.4;
+      for (k = 0; k < stageEls.length; k++) {
+        var stn = +stageEls[k].getAttribute('data-stage'); if (stn < 1 || stn > 5) continue;
+        var cyk = stageEls[k].getBoundingClientRect().top + 70 + 180 * CHAP.s;
+        var dk = Math.abs(cyk - vh * 0.4); if (dk < best) { best = dk; by = cyk; }
+      }
+      CHAP.y = by;
+    }
     /* position: hero → side → back to centre for the answer */
     var f1 = ease(clamp(p, 0, 1)), f6 = ease(clamp(p - 5, 0, 1));
     var X = lerp(lerp(HERO.x, CHAP.x, f1), HERO.x, f6), Y = lerp(lerp(HERO.y, CHAP.y, f1), HERO.y, f6);
